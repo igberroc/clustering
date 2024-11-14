@@ -7,24 +7,43 @@ Created on Sun Oct 27 13:20:09 2024
 
 from abc import ABC, abstractmethod
 import math
-from typing import Self, Callable
+from typing import Self, Callable, TypeVar
 import random
 
-class Punto:
-    def __init__(self, *coordenadas):
-        self.coordenadas = coordenadas
+T = TypeVar('T')
 
-    def dimension(self):
+type Distancia = Callable[[T, T], float]
+
+def distancia_euclidea(punto1: Punto, punto2: Punto) -> float:
+    cord1 = punto1.get_coordenadas()
+    cord2 = punto2.get_coordenadas()
+    d = 0
+    for x1,y1 in zip(cord1,cord2):
+        d += (x1 - y1)**2
+    return math.sqrt(d)
+
+def distancia_manhattan(punto1: Punto, punto2: Punto) -> float:
+    cord1 = punto1.get_coordenadas()
+    cord2 = punto2.get_coordenadas()
+    d = 0
+    for x1,y1 in zip(cord1,cord2):
+        d += abs(x1 - y1)
+    return d
+
+def distancia_str(s1: str, s2: str) -> float:
+    return sum(1 for x,y in zip(s1,s2) if x != y)
+
+
+class Punto:
+    def __init__(self, *coordenadas: float):
         return len(self.coordenadas)
 
     def get_coordenadas(self):
         return self.coordenadas
 
     def sumar(self, other: Self) -> Self:
-        suma = [0 for _ in range(self.dimension())]
         for i in range(self.dimension()):
-            suma[i] = self.coordenadas[i] + other.coordenadas[i]
-        self.coordenadas = tuple(suma)
+            self.coordenadas[i] += other.coordenadas[i]
 
     def dividir_num(self,n):
         coord = list(self.coordenadas)
@@ -38,26 +57,6 @@ class Punto:
         p.coordenadas = (0,)*dimension
         return p
 
-
-type Distancia = Callable[[Punto, Punto], float]
-
-def distancia_euclidea(punto1: Punto, punto2: Punto) -> float:
-    cord1 = punto1.get_coordenadas()
-    cord2 = punto2.get_coordenadas()
-    d = 0
-    for x1,y1 in zip(cord1,cord2):
-        d += (x1 - y1)**2
-    return math.sqrt(d)
-
-
-
-def distancia_manhattan(punto1: Punto, punto2: Punto) -> float:
-    cord1 = punto1.get_coordenadas()
-    cord2 = punto2.get_coordenadas()
-    d = 0
-    for x1,y1 in zip(cord1,cord2):
-        d += abs(x1 - y1)
-    return d
 
 class Clusters:
     def __init__(self, puntos: set[Punto] = set()):
