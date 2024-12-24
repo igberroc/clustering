@@ -1,0 +1,156 @@
+# -*- coding: utf-8 -*-
+
+import random
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.datasets import make_moons
+import numpy as np
+
+from puntos import Punto, Cluster
+from dbscan import dbscan
+from metricas import indice_Silueta, indice_DB
+
+def desglosar_x_y(cluster: Cluster) -> tuple[list[float],list[float]]:
+    x = []
+    y = []
+    for punto in cluster.puntos:
+       x.append(punto.coordenadas[0])
+       y.append(punto.coordenadas[1])
+    return (x,y)
+
+
+def color_aleatorio():
+    return f'#{random.randint(0, 255):02x}{random.randint(0, 255):02x}{random.randint(0, 255):02x}'
+
+
+def main1():
+    df = pd.read_csv('C:/Users/nacho/Downloads/dataset_dbscan.csv')
+    lista_x = df['Weight'].tolist()
+    lista_y = df['Height'].tolist()
+    datos = []
+    for i,j in zip(lista_x,lista_y):
+        datos.append(Punto(i,j))
+        
+    eps = 0.6
+    minPts = 5
+    (lista_clusters, ruido) = dbscan(datos,eps,minPts)
+    
+    colores_usados = set()
+    for cluster in lista_clusters:
+        (x,y) = desglosar_x_y(cluster)
+        color = color_aleatorio()
+        while color in colores_usados:
+            color = color_aleatorio()
+        colores_usados.add(color)
+        plt.scatter(x,y, s = 10, color = color)
+    
+    silueta = indice_Silueta(lista_clusters)
+    print(f"El indice de silueta es: {silueta} ")
+    
+    db = indice_DB(lista_clusters)
+    print(f"El indice de Davies-Bouldin es: {db} ")
+
+    
+    (x,y) = desglosar_x_y(ruido)
+    plt.scatter(x,y, s = 10, color = 'black')
+    
+    
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title("Clusters DBSCAN")
+    plt.legend()
+    plt.show()
+    
+def main2():
+    data, y = make_moons(n_samples=300, noise=0.1, random_state=42)
+    lista_x = data[:,0].tolist()
+    lista_y = data[:,1].tolist()
+    datos = []
+    for i,j in zip(lista_x,lista_y):
+        datos.append(Punto(i,j))
+        
+    eps = 0.2
+    minPts = 5
+    (lista_clusters, ruido) = dbscan(datos,eps,minPts)
+    
+    colores_usados = set()
+    for cluster in lista_clusters:
+        (x,y) = desglosar_x_y(cluster)
+        color = color_aleatorio()
+        while color in colores_usados:
+            color = color_aleatorio()
+        colores_usados.add(color)
+        plt.scatter(x,y, s = 10, color = color)
+    
+    silueta = indice_Silueta(lista_clusters)
+    print(f"El indice de silueta es: {silueta} ")
+    
+    db = indice_DB(lista_clusters)
+    print(f"El indice de Davies-Bouldin es: {db} ")
+
+    (x,y) = desglosar_x_y(ruido)
+    plt.plot(x,y, 'o', color = 'black')
+    
+    
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title("Clusters DBSCAN")
+    plt.legend()
+    plt.show()
+    
+
+def main3():
+    
+    def twospirals(n_puntos, ruido=.5):
+        epsilon = 0.1
+        n = (np.random.rand(n_puntos,1)+epsilon) * 780 * (2*np.pi)/360
+        d1x = -np.cos(n)*n + np.random.rand(n_puntos,1) * ruido
+        d1y = np.sin(n)*n + np.random.rand(n_puntos,1) * ruido
+        C_1 = np.hstack((d1x,d1y))
+        C_2 = np.hstack((-d1x,-d1y))
+        return np.vstack((C_1, C_2))
+    
+    n_puntos = 500
+    dataset = twospirals(n_puntos)
+    datos = []
+    for [x1,x2] in dataset:
+        datos.append(Punto(x1,x2))
+    eps = 1.7
+    minPts = 2
+    (lista_clusters, ruido) = dbscan(datos,eps,minPts)
+    
+    colores_usados = set()
+    for cluster in lista_clusters:
+        (x,y) = desglosar_x_y(cluster)
+        color = color_aleatorio()
+        while color in colores_usados:
+            color = color_aleatorio()
+        colores_usados.add(color)
+        plt.scatter(x,y, s = 10, color = color)
+    
+    silueta = indice_Silueta(lista_clusters)
+    print(f"El indice de silueta es: {silueta} ")
+    
+    db = indice_DB(lista_clusters)
+    print(f"El indice de Davies-Bouldin es: {db} ")
+
+
+    (x,y) = desglosar_x_y(ruido)
+    plt.plot(x,y, 'o', color = 'black')
+    
+    
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title("Clusters DBSCAN")
+    plt.legend()
+    plt.show()
+        
+        
+   
+
+
+
+    
+
+
+
