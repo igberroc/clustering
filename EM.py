@@ -5,7 +5,7 @@ import numpy as np
 from scipy.stats import multivariate_normal
 
 
-from puntos import Cluster, Punto
+from points import Cluster, Point
 
 def inicializacion(array: np.ndarray, n_clusters: int,
                    n: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -33,7 +33,7 @@ def inicializacion(array: np.ndarray, n_clusters: int,
     return (u,covarianzas,pesos)
 
 
-def em(datos: list[Punto], n_clusters: int, error: float,
+def em(datos: list[Point], n_clusters: int, error: float,
        max_iterac: int) -> list[Cluster]:
     """
     Given a set of data, the number of clusters, and conditions for the loop´s body,
@@ -50,7 +50,7 @@ def em(datos: list[Punto], n_clusters: int, error: float,
     -------
     lista_clusters: list with final clusters.
     """
-    array = np.array([list(punto.get_coordenadas()) for punto in datos])
+    array = np.array([list(Point.get_coordinates()) for Point in datos])
     n = len(datos)
     (u,covarianzas,pesos) = inicializacion(array, n_clusters,n)
     matriz_prob = np.zeros((n, n_clusters))
@@ -74,9 +74,9 @@ def em(datos: list[Punto], n_clusters: int, error: float,
     lista_clusters = [Cluster() for _ in range(n_clusters)]
     sol = np.argmax(matriz_prob, axis = 1)
     for i in range(n):
-        punto = datos[i]
+        Point = datos[i]
         j = sol[i]
-        lista_clusters[j].agregar_punto(punto)
+        lista_clusters[j].add_Point(Point)
     return lista_clusters
         
         

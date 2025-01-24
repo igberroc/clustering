@@ -5,9 +5,9 @@
 import math
 import numpy as np
 
-from puntos import Distancia, Cluster, distancia_euclidea, Punto
+from points import Distance, Cluster, Distance_euclidea, Point
 
-def crear_matriz_proximidad(datos:list[Punto], dist: Distancia = distancia_euclidea) -> tuple[np.ndarray,float,tuple[int,int]]:
+def crear_matriz_proximidad(datos:list[Point], dist: Distance = Distance_euclidea) -> tuple[np.ndarray,float,tuple[int,int]]:
     n = len(datos)
     M = np.zeros((n,n))
     minimo = math.inf
@@ -15,15 +15,15 @@ def crear_matriz_proximidad(datos:list[Punto], dist: Distancia = distancia_eucli
     j_minimo = 1
     for i in range(n-1):
         for j in range(i+1,n):
-            distancia = dist(datos[i],datos[j])
-            M[i,j] = distancia
-            if distancia < minimo:
+            Distance = dist(datos[i],datos[j])
+            M[i,j] = Distance
+            if Distance < minimo:
                 i_minimo = i
                 j_minimo = j
-                minimo = distancia
+                minimo = Distance
     return (M,minimo,(i_minimo,j_minimo))
     
-def minima_distancia(M: np.ndarray) -> tuple[float,tuple[int,int]]:
+def minima_Distance(M: np.ndarray) -> tuple[float,tuple[int,int]]:
     n = len(M)
     d_minima = math.inf
     i_minimo = 0
@@ -43,9 +43,9 @@ def lance_williams(M:np.ndarray, l:int, i:int, j:int, a:float, b:float, c:float,
     return a*A + b*B + c*C + d*abs(A - B)
  
 
-#Damos la maxima distancia a la que queremos que se unan los cluster
-def aglomerativo(datos: list[Punto], a:float, b:float, c:float, d:float, maximo: float = 0,
-                 dist: Distancia = distancia_euclidea) -> tuple[list[list], list[Cluster]]:
+#Damos la maxima Distance a la que queremos que se unan los cluster
+def aglomerativo(datos: list[Point], a:float, b:float, c:float, d:float, maximo: float = 0,
+                 dist: Distance = Distance_euclidea) -> tuple[list[list], list[Cluster]]:
     resultado = []
     n = len(datos)
     matriz_enlace = []
@@ -57,11 +57,11 @@ def aglomerativo(datos: list[Punto], a:float, b:float, c:float, d:float, maximo:
         resultado.append(cluster)
     for s in range(n-1):
         if s != 0:
-            (d_minima,(i,j)) = minima_distancia(M)
+            (d_minima,(i,j)) = minima_Distance(M)
         (cluster1,k1) = lista_clusters.pop(j)
         (cluster2,k2) = lista_clusters[i]
-        matriz_enlace.append([k1,k2,d_minima,cluster1.num_puntos() + cluster2.num_puntos()])
-        new_cluster = cluster1.combinar(cluster2)
+        matriz_enlace.append([k1,k2,d_minima,cluster1.num_points() + cluster2.num_points()])
+        new_cluster = cluster1.combine(cluster2)
         lista_clusters[i] = (new_cluster, n + s)
         if d_minima <= maximo:
             resultado.pop(j)
