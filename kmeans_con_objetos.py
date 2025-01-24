@@ -5,7 +5,9 @@ import random
 import copy
 import math
 
+hola = "hola"
 from puntos import Distancia, Cluster, distancia_euclidea, Punto
+
 
 def diferencia_centroides(centroides, new_centroides, error, dist: Distancia = distancia_euclidea) -> bool:
     """
