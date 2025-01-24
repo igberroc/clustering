@@ -19,15 +19,15 @@ def descompose_x_y(lista: list[Point]) -> tuple[list[float],list[float]]:
 def main1():
     delta = 0.25
     npoints = 20
-    datos1 = [Point(1 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(npoints)]
-    datos2 = [Point(1 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
-    datos3 = [Point(0 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(npoints)]
-    datos4 = [Point(0 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
-    datos = datos1 + datos2 + datos3 + datos4
-    (x,y) = descompose_x_y(datos)
+    data1 = [Point(1 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(npoints)]
+    data2 = [Point(1 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
+    data3 = [Point(0 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(npoints)]
+    data4 = [Point(0 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
+    data = data1 + data2 + data3 + data4
+    (x,y) = descompose_x_y(data)
     
     inicial_centroids = [Point(random.uniform(-5,5),random.uniform(-5,5)) for _ in range(4)]
-    matriz_pertenencia = fuzzy_cmeans(datos,inicial_centroids,2,4,0.001, 100)
+    matriz_pertenencia = fuzzy_cmeans(data,inicial_centroids,2,4,0.001, 100)
     
     
     for i in range(4):

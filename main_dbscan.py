@@ -8,7 +8,7 @@ import numpy as np
 
 from points import Point, Cluster
 from dbscan import dbscan
-from metricas import indice_Silueta, indice_DB
+from metricas import silhouette_index, db_index
 
 def descompose_x_y(cluster: Cluster) -> tuple[list[float],list[float]]:
     x = []
@@ -27,16 +27,16 @@ def main1():
     df = pd.read_csv('C:/Users/nacho/Downloads/dataset_dbscan.csv')
     lista_x = df['Weight'].tolist()
     lista_y = df['Height'].tolist()
-    datos = []
+    data = []
     for i,j in zip(lista_x,lista_y):
-        datos.append(Point(i,j))
+        data.append(Point(i,j))
         
     eps = 0.6
     minPts = 5
-    (lista_clusters, ruido) = dbscan(datos,eps,minPts)
+    (list_clusters, ruido) = dbscan(data,eps,minPts)
     
     colores_usados = set()
-    for cluster in lista_clusters:
+    for cluster in list_clusters:
         (x,y) = descompose_x_y(cluster)
         color = color_aleatorio()
         while color in colores_usados:
@@ -44,11 +44,11 @@ def main1():
         colores_usados.add(color)
         plt.scatter(x,y, s = 10, color = color)
     
-    silueta = indice_Silueta(lista_clusters)
-    print(f"El indice de silueta es: {silueta} ")
+    silhouette = silhouette_index(list_clusters)
+    print(f"El index de silhouette es: {silhouette} ")
     
-    db = indice_DB(lista_clusters)
-    print(f"El indice de Davies-Bouldin es: {db} ")
+    db = db_index(list_clusters)
+    print(f"El index de Davies-Bouldin es: {db} ")
 
     
     (x,y) = descompose_x_y(ruido)
@@ -63,15 +63,15 @@ def main1():
     
 def main2():
     data, y = make_moons(n_samples=300, noise=0.1, random_state=42)
-    datos = []
+    data = []
     for [i,j] in data:
-        datos.append(Point(i,j))
+        data.append(Point(i,j))
     eps = 0.2
     minPts = 5
-    (lista_clusters, ruido) = dbscan(datos,eps,minPts)
+    (list_clusters, ruido) = dbscan(data,eps,minPts)
     
     colores_usados = set()
-    for cluster in lista_clusters:
+    for cluster in list_clusters:
         (x,y) = descompose_x_y(cluster)
         color = color_aleatorio()
         while color in colores_usados:
@@ -79,11 +79,11 @@ def main2():
         colores_usados.add(color)
         plt.scatter(x,y, s = 10, color = color)
     
-    silueta = indice_Silueta(lista_clusters)
-    print(f"El indice de silueta es: {silueta} ")
+    silhouette = silhouette_index(list_clusters)
+    print(f"El index de silhouette es: {silhouette} ")
     
-    db = indice_DB(lista_clusters)
-    print(f"El indice de Davies-Bouldin es: {db} ")
+    db = db_index(list_clusters)
+    print(f"El index de Davies-Bouldin es: {db} ")
 
     (x,y) = descompose_x_y(ruido)
     plt.plot(x,y, 'o', color = 'black')
@@ -109,15 +109,15 @@ def main3():
     
     n_points = 500
     dataset = twospirals(n_points)
-    datos = []
+    data = []
     for [x1,x2] in dataset:
-        datos.append(Point(x1,x2))
+        data.append(Point(x1,x2))
     eps = 1.7
     minPts = 2
-    (lista_clusters, ruido) = dbscan(datos,eps,minPts)
+    (list_clusters, ruido) = dbscan(data,eps,minPts)
     
     colores_usados = set()
-    for cluster in lista_clusters:
+    for cluster in list_clusters:
         (x,y) = descompose_x_y(cluster)
         color = color_aleatorio()
         while color in colores_usados:
@@ -125,11 +125,11 @@ def main3():
         colores_usados.add(color)
         plt.scatter(x,y, s = 10, color = color)
     
-    silueta = indice_Silueta(lista_clusters)
-    print(f"El indice de silueta es: {silueta} ")
+    silhouette = silhouette_index(list_clusters)
+    print(f"El index de silhouette es: {silhouette} ")
     
-    db = indice_DB(lista_clusters)
-    print(f"El indice de Davies-Bouldin es: {db} ")
+    db = db_index(list_clusters)
+    print(f"El index de Davies-Bouldin es: {db} ")
 
 
     (x,y) = descompose_x_y(ruido)

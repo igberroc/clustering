@@ -26,38 +26,38 @@ def inicializacion(array: np.ndarray, n_clusters: int,
     pesos: array with probabilities for belonging to each cluster (each distribution)
     """
     d = len(array[0])
-    indices = np.random.choice(n, n_clusters, replace=False)
-    u = array[indices]
+    indexs = np.random.choice(n, n_clusters, replace=False)
+    u = array[indexs]
     covarianzas = [np.eye(d) for _ in range(n_clusters)]
     pesos = np.ones(n_clusters) / n_clusters
     return (u,covarianzas,pesos)
 
 
-def em(datos: list[Point], n_clusters: int, error: float,
-       max_iterac: int) -> list[Cluster]:
+def em(data: list[Point], n_clusters: int, error: float,
+       max_iter: int) -> list[Cluster]:
     """
     Given a set of data, the number of clusters, and conditions for the loop´s body,
     returns the list of the clusters.
     
     Parameters
     ----------
-    datos: list of points
+    data: list of points
     n_clusters: number of clusters. 
     error: minimum difference between new log_likelihood and old likelihood for finishing the loop.
-    max_iterac: maximum number of iterations
+    max_iter: maximum number of iterations
 
     Returns
     -------
-    lista_clusters: list with final clusters.
+    list_clusters: list with final clusters.
     """
-    array = np.array([list(Point.get_coordinates()) for Point in datos])
-    n = len(datos)
+    array = np.array([list(Point.get_coordinates()) for Point in data])
+    n = len(data)
     (u,covarianzas,pesos) = inicializacion(array, n_clusters,n)
     matriz_prob = np.zeros((n, n_clusters))
     log = 0
     new_log = -np.inf
     iterac = 0
-    while iterac < max_iterac and abs(new_log - log) > error:
+    while iterac < max_iter and abs(new_log - log) > error:
         for k in range(n_clusters):
             matriz_prob[:, k] = pesos[k] * multivariate_normal.pdf(array, mean = u[k], cov = covarianzas[k])
         matriz_prob /= matriz_prob.sum(axis = 1, keepdims = True)
@@ -71,13 +71,13 @@ def em(datos: list[Point], n_clusters: int, error: float,
         new_log = np.sum(np.log(np.sum([
             pesos[k] * multivariate_normal.pdf(array, mean = u[k], cov = covarianzas[k]) for k in range(n_clusters)
         ], axis=0)))
-    lista_clusters = [Cluster() for _ in range(n_clusters)]
+    list_clusters = [Cluster() for _ in range(n_clusters)]
     sol = np.argmax(matriz_prob, axis = 1)
     for i in range(n):
-        Point = datos[i]
+        Point = data[i]
         j = sol[i]
-        lista_clusters[j].add_Point(Point)
-    return lista_clusters
+        list_clusters[j].add_Point(Point)
+    return list_clusters
         
         
     

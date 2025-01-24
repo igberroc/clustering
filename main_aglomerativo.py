@@ -12,28 +12,28 @@ from scipy.cluster.hierarchy import dendrogram
 
 from aglomerativo import aglomerativo
 from points import Point
-from metricas import indice_Silueta, indice_DB
+from metricas import silhouette_index, db_index
 
 def main1():
     delta = 0.25
     npoints = 20
-    datos1 = [Point(1 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(npoints)]
-    datos2 = [Point(1 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
-    datos3 = [Point(0 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(npoints)]
-    datos4 = [Point(0 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
-    datos = datos1 + datos2 + datos3 + datos4
+    data1 = [Point(1 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(npoints)]
+    data2 = [Point(1 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
+    data3 = [Point(0 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(npoints)]
+    data4 = [Point(0 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
+    data = data1 + data2 + data3 + data4
     
-    (matriz_enlace,resultado) = aglomerativo(datos,0.5,0.5,0,-0.5,0.4)
-    silueta = indice_Silueta(resultado)
-    print(f"El indice de silueta es: {silueta} ")
+    (matriz_enlace,resultado) = aglomerativo(data,0.5,0.5,0,-0.5,0.4)
+    silhouette = silhouette_index(resultado)
+    print(f"El index de silhouette es: {silhouette} ")
     
     
-    db = indice_DB(resultado)
-    print(f"El indice de Davies-Bouldin es: {db} ")
+    db = db_index(resultado)
+    print(f"El index de Davies-Bouldin es: {db} ")
     
     plt.figure()
     dendrogram(np.array(matriz_enlace))
-    plt.xlabel("Indice de los clusters")
+    plt.xlabel("index de los clusters")
     plt.ylabel("Distance entre clusters")
     plt.show()
 
@@ -41,22 +41,22 @@ def main1():
 def main2():
     iris = load_iris()
     lista_iris = (iris.data).tolist()
-    datos = []
+    data = []
     for dato in lista_iris:
         p = Point()
         p.coordinates = tuple(dato)
-        datos.append(p)
-    (matriz_enlace,resultado) = aglomerativo(datos,0.5,0.5,0,-0.5,1)
+        data.append(p)
+    (matriz_enlace,resultado) = aglomerativo(data,0.5,0.5,0,-0.5,1)
     
-    silueta = indice_Silueta(resultado)
-    print(f"El indice de silueta es: {silueta} ")
-    db = indice_DB(resultado)
-    print(f"El indice de Davies-Bouldin es: {db} ")
+    silhouette = silhouette_index(resultado)
+    print(f"El index de silhouette es: {silhouette} ")
+    db = db_index(resultado)
+    print(f"El index de Davies-Bouldin es: {db} ")
     
     
     plt.figure()
     dendrogram(np.array(matriz_enlace))
-    plt.xlabel("Indice de los clusters")
+    plt.xlabel("index de los clusters")
     plt.ylabel("Distance entre clusters")
     plt.show()
 

@@ -7,30 +7,30 @@ import random
 from sklearn.datasets import make_moons
 
 from kmeans_con_objetos import kmeans
-from points import Point, descompose_x_y
-from metricas import indice_Silueta, indice_DB
+from puntos import Point, descompose_x_y
+from metricas import silhouette_index, db_index
 
 
 def main1():
     delta = 0.25
-    npoints = 20
-    datos1 = [Point(1 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(npoints)]
-    datos2 = [Point(1 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
-    datos3 = [Point(0 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(npoints)]
-    datos4 = [Point(0 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
-    datos = datos1 + datos2 + datos3 + datos4
+    n_points = 20
+    data1 = [Point(1 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(n_points)]
+    data2 = [Point(1 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(n_points)]
+    data3 = [Point(0 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(n_points)]
+    data4 = [Point(0 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(n_points)]
+    data = data1 + data2 + data3 + data4
     
-    lista_clusters = kmeans(datos,4,0.001,100)
-    silueta = indice_Silueta(lista_clusters)
-    print(f"El indice de silueta es: {silueta} ")
+    list_clusters = kmeans(data,4,0.001,100)
+    silhouette = silhouette_index(list_clusters)
+    print(f"The Silhouette index is: {silhouette} ")
     
-    db = indice_DB(lista_clusters)
-    print(f"El indice de Davies-Bouldin es: {db} ")
+    db = db_index(list_clusters)
+    print(f"The Davies-Bouldin index is: {db} ")
 
-    (x1,y1) = descompose_x_y(lista_clusters[0])
-    (x2,y2) = descompose_x_y(lista_clusters[1])
-    (x3,y3) = descompose_x_y(lista_clusters[2])
-    (x4,y4) = descompose_x_y(lista_clusters[3])  
+    (x1,y1) = descompose_x_y(list_clusters[0])
+    (x2,y2) = descompose_x_y(list_clusters[1])
+    (x3,y3) = descompose_x_y(list_clusters[2])
+    (x4,y4) = descompose_x_y(list_clusters[3])  
     
     plt.plot(x1,y1,'o',markerfacecolor = 'red') 
     plt.plot(x2,y2,'o',markerfacecolor = 'blue') 
@@ -46,20 +46,20 @@ def main1():
     
 
 def main2():
-    data, y = make_moons(n_samples=300, noise=0.1, random_state=42)
-    datos = []
-    for [i,j] in data:
-        datos.append(Point(i,j))
+    dataset, y = make_moons(n_samples = 300, noise = 0.1, random_state = 42)
+    data = []
+    for [i,j] in dataset:
+        data.append(Point(i,j))
     
-    lista_clusters = kmeans(datos,2,0.001,100)
-    silueta = indice_Silueta(lista_clusters)
-    print(f"El indice de silueta es: {silueta} ")
+    list_clusters = kmeans(data,2,0.001,100)
+    silhouette = silhouette_index(list_clusters)
+    print(f"The Silhouette index is: {silhouette} ")
     
-    db = indice_DB(lista_clusters)
-    print(f"El indice de Davies-Bouldin es: {db} ")
+    db = db_index(list_clusters)
+    print(f"The Davies-Bouldin index is: {db} ")
 
-    (x1,y1) = descompose_x_y(lista_clusters[0])
-    (x2,y2) = descompose_x_y(lista_clusters[1])
+    (x1,y1) = descompose_x_y(list_clusters[0])
+    (x2,y2) = descompose_x_y(list_clusters[1])
     
     plt.plot(x1,y1,'o',markerfacecolor = 'red') 
     plt.plot(x2,y2,'o',markerfacecolor = 'blue') 
