@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import dendrogram
 
 
-from aglomerativo import aglomerativo
-from points import Point
+from aglomerativo import agglomerative
+from puntos import Point
 from metricas import silhouette_index, db_index
 
 def main1():
@@ -23,41 +23,41 @@ def main1():
     data4 = [Point(0 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
     data = data1 + data2 + data3 + data4
     
-    (matriz_enlace,resultado) = aglomerativo(data,0.5,0.5,0,-0.5,0.4)
-    silhouette = silhouette_index(resultado)
-    print(f"El index de silhouette es: {silhouette} ")
+    (linkage_matrix,result) = agglomerative(data,0.5,0.5,0,-0.5,0.4)
+    silhouette = silhouette_index(result)
+    print(f"The Silhouette index is: {silhouette} ")
     
     
-    db = db_index(resultado)
-    print(f"El index de Davies-Bouldin es: {db} ")
+    db = db_index(result)
+    print(f"The Davies-Bouldin index is: {db} ")
     
     plt.figure()
-    dendrogram(np.array(matriz_enlace))
-    plt.xlabel("index de los clusters")
-    plt.ylabel("Distance entre clusters")
+    dendrogram(np.array(linkage_matrix))
+    plt.xlabel("clusters indexes")
+    plt.ylabel("distance between clusters")
     plt.show()
 
 
 def main2():
     iris = load_iris()
-    lista_iris = (iris.data).tolist()
+    iris_list = iris.data.tolist()
     data = []
-    for dato in lista_iris:
+    for elem in iris_list:
         p = Point()
-        p.coordinates = tuple(dato)
+        p.coordinates = tuple(elem)
         data.append(p)
-    (matriz_enlace,resultado) = aglomerativo(data,0.5,0.5,0,-0.5,1)
+    (linkage_matrix,result) = agglomerative(data,0.5,0.5,0,-0.5,1)
     
-    silhouette = silhouette_index(resultado)
-    print(f"El index de silhouette es: {silhouette} ")
-    db = db_index(resultado)
-    print(f"El index de Davies-Bouldin es: {db} ")
+    silhouette = silhouette_index(result)
+    print(f"The silhouette index is: {silhouette} ")
+    db = db_index(result)
+    print(f"The Davies-Bouldin index is: {db} ")
     
     
     plt.figure()
-    dendrogram(np.array(matriz_enlace))
-    plt.xlabel("index de los clusters")
-    plt.ylabel("Distance entre clusters")
+    dendrogram(np.array(linkage_matrix))
+    plt.xlabel("clusters indexes")
+    plt.ylabel("distance between clusters")
     plt.show()
 
     

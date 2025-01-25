@@ -104,7 +104,7 @@ class Cluster:
         return cluster
     
     def size(self) -> int:
-        return (len(self.points))
+        return len(self.points)
     
     def combine(self,other) -> Self:
         cluster = self.copy_cluster()
