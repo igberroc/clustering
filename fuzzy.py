@@ -3,31 +3,30 @@
 import numpy as np
 import copy
 
-from points import Distance, euclidean_distance, Point
+from puntos import Distance, euclidean_distance, Point
 
 
-def centroids_condition(centroids: list[Point], new_centroids: list[Point], 
-                          error: int, dist: Distance = euclidean_distance) -> bool:
+def centroids_condition(centroids: list[Point], new_centroids: list[Point],
+                        eps: float, dist: Distance = euclidean_distance) -> bool:
     """
-    Given the list of new and old centroids, it returns true if stop condition is satisfied 
-    or false if not.
+    Given the lists of old and new centroids and a number, returns true if the distance between
+    each new and old centroid is less than the given number, and false in other case.
 
     Parameters
     ----------
-    centroids : old centroids
-    new_centroids : new centroids
-    error : maximum error for new and old centroids.
-    dist : Distance to use
-
+    centroids: list of old centroids.
+    new_centroids: list of new centroids.
+    eps: number used to compare the distance between centroids.
+    dist: distance to use.
     Returns
     -------
-    bool: stop condition satisfied or not
+    condition satisfied or not.
 
     """
     if centroids == []:
         return True
     for i in range(len(centroids)):
-        if dist(centroids[i], new_centroids[i]) > error:
+        if dist(centroids[i], new_centroids[i]) > eps:
             return True
     return False
 
