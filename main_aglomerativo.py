@@ -32,7 +32,7 @@ def main1():
     print(f"The Davies-Bouldin index is: {db} ")
     
     plt.figure()
-    dendrogram(np.array(linkage_matrix))
+    dendrogram(linkage_matrix)
     plt.xlabel("clusters indexes")
     plt.ylabel("distance between clusters")
     plt.show()
@@ -55,7 +55,7 @@ def main2():
     
     
     plt.figure()
-    dendrogram(np.array(linkage_matrix))
+    dendrogram(linkage_matrix)
     plt.xlabel("clusters indexes")
     plt.ylabel("distance between clusters")
     plt.show()

@@ -95,7 +95,7 @@ def lance_williams(matrix:np.ndarray, l:int, i:int, j:int, a:float, b:float, c:f
 
 
 def agglomerative(data: list[Point], a:float, b:float, c:float, d:float, max_dist: float = 0,
-                  dist: Distance = euclidean_distance) -> tuple[list[list], list[Cluster]]:
+                  dist: Distance = euclidean_distance) -> tuple[np.ndarray, list[Cluster]]:
     """
     Given a set of data, the parameters for lance williams formula, the maximum distance allowed to combine two clusters,
     and the distance to use, returns the linkage matrix and the final clusters, where each list of linkage matrix is:
@@ -118,22 +118,27 @@ def agglomerative(data: list[Point], a:float, b:float, c:float, d:float, max_dis
     Returns
     -------
     linkage matrix and the list with the final clusters.
+
+    Complexity
+    -------
+    O(N^3) where N: number of points.
+
     """
     result = []
     n = len(data)
-    linkage_matrix = []
-    list_clusters = []
+    linkage_matrix = np.zeros((n-1,4))
+    list_clusters = [0 for _ in range(n)]
     (matrix, minimum, (i,j)) = proximity_matrix(data, dist)
     for k in range(n):
         cluster = Cluster({data[k]})
-        list_clusters.append((cluster,k))
+        list_clusters[k] = ((cluster,k))
         result.append(cluster)
     for s in range(n-1):
         if s != 0:
             (minimum,(i,j)) = min_distance(matrix)
         (cluster1,k1) = list_clusters.pop(j)
         (cluster2,k2) = list_clusters[i]
-        linkage_matrix.append([k1,k2,minimum,cluster1.num_points() + cluster2.num_points()])
+        linkage_matrix[s] = np.array([k1,k2,minimum,cluster1.num_points() + cluster2.num_points()])
         new_cluster = cluster1.combine(cluster2)
         list_clusters[i] = (new_cluster, n + s)
         if minimum <= max_dist:

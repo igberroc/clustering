@@ -4,7 +4,7 @@ import seaborn as sns
 import random
 import matplotlib.pyplot as plt
 
-from points import Point
+from puntos import Point
 from fuzzy import fuzzy_cmeans
 
 def descompose_x_y(lista: list[Point]) -> tuple[list[float],list[float]]:
@@ -25,15 +25,14 @@ def main1():
     data4 = [Point(0 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
     data = data1 + data2 + data3 + data4
     (x,y) = descompose_x_y(data)
-    
-    inicial_centroids = [Point(random.uniform(-5,5),random.uniform(-5,5)) for _ in range(4)]
-    matriz_pertenencia = fuzzy_cmeans(data,inicial_centroids,2,4,0.001, 100)
-    
-    
+
+    initial_centroids = [Point(random.uniform(-5, 5), random.uniform(-5, 5)) for _ in range(4)]
+    membership_matrix = fuzzy_cmeans(data, initial_centroids,2,4,0.001, 100)
+
     for i in range(4):
         plt.figure()
-        scatter = plt.scatter(x,y, c = matriz_pertenencia[i,:], cmap=plt.cm.Blues, s = 50)
-        plt.colorbar(scatter, label=f'Grado de pertenencia al cluster {i+1}')
+        scatter = plt.scatter(x,y, c = membership_matrix[i,:], cmap=plt.cm.Blues, s = 50)
+        plt.colorbar(scatter, label=f'Membership degree to cluster {i+1}')
         plt.title(f'Cluster {i+1}')
         plt.xlabel('X')
         plt.ylabel('Y')
@@ -42,18 +41,17 @@ def main1():
     
 def main_penguins():
     penguins = sns.load_dataset('penguins').dropna()
-    X = penguins[['bill_length_mm', 'bill_depth_mm']].values.tolist()
-    for i in range(len(X)):
-        X[i] = Point(X[i][0],X[i][1])
-        
-    inicial_centroids = [Point(random.uniform(-5,5),random.uniform(-5,5)) for _ in range(3)]
-    matriz_pertenencia = fuzzy_cmeans(X,inicial_centroids,2,3,0.001, 100)
-    
-    (x,y) = descompose_x_y(X)
+    dataset = penguins[['bill_length_mm', 'bill_depth_mm']].values.tolist()
+    for i in range(len(dataset)):
+        dataset[i] = Point(dataset[i][0],dataset[i][1])
+    (x, y) = descompose_x_y(dataset)
+
+    initial_centroids = [Point(random.uniform(-5,5),random.uniform(-5,5)) for _ in range(3)]
+    membership_matrix = fuzzy_cmeans(dataset, initial_centroids,2,3,0.001, 100)
     for i in range(3):
         plt.figure()
-        scatter = plt.scatter(x,y, c = matriz_pertenencia[i,:], cmap=plt.cm.Blues, s = 50)
-        plt.colorbar(scatter, label=f'Grado de pertenencia al cluster {i+1}')
+        scatter = plt.scatter(x,y, c = membership_matrix[i,:], cmap=plt.cm.Blues, s = 50)
+        plt.colorbar(scatter, label=f'Membership degree to cluster {i+1}')
         plt.title(f'Cluster {i+1}')
         plt.xlabel('X')
         plt.ylabel('Y')

@@ -53,9 +53,9 @@ def kmeans(data: list[Point], k: int, eps: float, max_iter: int,
     
     Complexity
     -------
-    O(N*K*I) where N: number of points
-                   K: number of clusters
-                   I: number of iterations
+    O(N*K*I) where N: number of points.
+                   K: number of clusters.
+                   I: number of iterations.
 
     """
     iter = 0
@@ -66,7 +66,7 @@ def kmeans(data: list[Point], k: int, eps: float, max_iter: int,
         for cluster in list_clusters:
             cluster.clear()
         centroids = copy.deepcopy(new_centroids)
-        new_centroids = []
+        new_centroids = [0 for _ in range(k)]
         for point in data:
             minimum = math.inf
             i = -1
@@ -77,9 +77,10 @@ def kmeans(data: list[Point], k: int, eps: float, max_iter: int,
                     i = j
             cluster = list_clusters[i]
             cluster.add_point(point)
-        for cluster in list_clusters:
+        for i in range(k):
+            cluster = list_clusters[i]
             centroid = cluster.centroid()
-            new_centroids.append(centroid)
+            new_centroids[i] = centroid
         iter += 1
     return list_clusters
 
