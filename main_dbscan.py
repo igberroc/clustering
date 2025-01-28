@@ -6,55 +6,46 @@ import pandas as pd
 from sklearn.datasets import make_moons
 import numpy as np
 
-from points import Point, Cluster
+from puntos import Point, Cluster, descompose_x_y
 from dbscan import dbscan
 from metricas import silhouette_index, db_index
 
-def descompose_x_y(cluster: Cluster) -> tuple[list[float],list[float]]:
-    x = []
-    y = []
-    for Point in cluster.points:
-       x.append(Point.coordinates[0])
-       y.append(Point.coordinates[1])
-    return (x,y)
 
 
-def color_aleatorio():
+def random_color():
     return f'#{random.randint(0, 255):02x}{random.randint(0, 255):02x}{random.randint(0, 255):02x}'
 
 
 def main1():
     df = pd.read_csv('C:/Users/nacho/Downloads/dataset_dbscan.csv')
-    lista_x = df['Weight'].tolist()
-    lista_y = df['Height'].tolist()
+    list_x = df['Weight'].tolist()
+    list_y = df['Height'].tolist()
     data = []
-    for i,j in zip(lista_x,lista_y):
+    for i,j in zip(list_x,list_y):
         data.append(Point(i,j))
         
     eps = 0.6
-    minPts = 5
-    (list_clusters, ruido) = dbscan(data,eps,minPts)
+    min_points = 5
+    (list_clusters, noise) = dbscan(data, eps, min_points)
     
-    colores_usados = set()
+    used_colors = set()
     for cluster in list_clusters:
         (x,y) = descompose_x_y(cluster)
-        color = color_aleatorio()
-        while color in colores_usados:
-            color = color_aleatorio()
-        colores_usados.add(color)
+        color = random_color()
+        while color in used_colors:
+            color = random_color()
+        used_colors.add(color)
         plt.scatter(x,y, s = 10, color = color)
     
     silhouette = silhouette_index(list_clusters)
-    print(f"El index de silhouette es: {silhouette} ")
+    print(f"The Silhouette index is: {silhouette} ")
     
     db = db_index(list_clusters)
-    print(f"El index de Davies-Bouldin es: {db} ")
+    print(f"The Davies-Bouldin index is: {db} ")
 
-    
-    (x,y) = descompose_x_y(ruido)
+    (x,y) = descompose_x_y(noise)
     plt.scatter(x,y, s = 10, color = 'black')
-    
-    
+
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.title("Clusters DBSCAN")
@@ -62,33 +53,32 @@ def main1():
     plt.show()
     
 def main2():
-    data, y = make_moons(n_samples=300, noise=0.1, random_state=42)
+    dataset, y = make_moons(n_samples=300, noise=0.1, random_state=42)
     data = []
-    for [i,j] in data:
+    for [i,j] in dataset:
         data.append(Point(i,j))
     eps = 0.2
-    minPts = 5
-    (list_clusters, ruido) = dbscan(data,eps,minPts)
+    min_points = 5
+    (list_clusters, noise) = dbscan(data, eps, min_points)
     
-    colores_usados = set()
+    used_colors = set()
     for cluster in list_clusters:
         (x,y) = descompose_x_y(cluster)
-        color = color_aleatorio()
-        while color in colores_usados:
-            color = color_aleatorio()
-        colores_usados.add(color)
+        color = random_color()
+        while color in used_colors:
+            color = random_color()
+        used_colors.add(color)
         plt.scatter(x,y, s = 10, color = color)
     
     silhouette = silhouette_index(list_clusters)
-    print(f"El index de silhouette es: {silhouette} ")
+    print(f"The Silhouette index is: {silhouette} ")
     
     db = db_index(list_clusters)
-    print(f"El index de Davies-Bouldin es: {db} ")
+    print(f"The Davies-Bouldin index is: {db} ")
 
-    (x,y) = descompose_x_y(ruido)
+    (x,y) = descompose_x_y(noise)
     plt.plot(x,y, 'o', color = 'black')
-    
-    
+
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.title("Clusters DBSCAN")
@@ -97,15 +87,15 @@ def main2():
     
 
 def main3():
-    
-    def twospirals(n_points, ruido=.5):
+
+    def twospirals(n_points, noise=.5):
         epsilon = 0.1
         n = (np.random.rand(n_points,1)+epsilon) * 780 * (2*np.pi)/360
-        d1x = -np.cos(n)*n + np.random.rand(n_points,1) * ruido
-        d1y = np.sin(n)*n + np.random.rand(n_points,1) * ruido
-        C_1 = np.hstack((d1x,d1y))
-        C_2 = np.hstack((-d1x,-d1y))
-        return np.vstack((C_1, C_2))
+        d1x = -np.cos(n)*n + np.random.rand(n_points,1) * noise
+        d1y = np.sin(n)*n + np.random.rand(n_points,1) * noise
+        c_1 = np.hstack((d1x,d1y))
+        c_2 = np.hstack((-d1x,-d1y))
+        return np.vstack((c_1, c_2))
     
     n_points = 500
     dataset = twospirals(n_points)
@@ -113,29 +103,27 @@ def main3():
     for [x1,x2] in dataset:
         data.append(Point(x1,x2))
     eps = 1.7
-    minPts = 2
-    (list_clusters, ruido) = dbscan(data,eps,minPts)
+    min_points = 2
+    (list_clusters, noise) = dbscan(data, eps, min_points)
     
-    colores_usados = set()
+    used_colors = set()
     for cluster in list_clusters:
         (x,y) = descompose_x_y(cluster)
-        color = color_aleatorio()
-        while color in colores_usados:
-            color = color_aleatorio()
-        colores_usados.add(color)
+        color = random_color()
+        while color in used_colors:
+            color = random_color()
+        used_colors.add(color)
         plt.scatter(x,y, s = 10, color = color)
     
     silhouette = silhouette_index(list_clusters)
-    print(f"El index de silhouette es: {silhouette} ")
+    print(f"The Silhouette index is: {silhouette} ")
     
     db = db_index(list_clusters)
-    print(f"El index de Davies-Bouldin es: {db} ")
+    print(f"The Davies-Bouldin index is: {db} ")
 
-
-    (x,y) = descompose_x_y(ruido)
+    (x,y) = descompose_x_y(noise)
     plt.plot(x,y, 'o', color = 'black')
-    
-    
+
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.title("Clusters DBSCAN")

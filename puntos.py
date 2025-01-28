@@ -118,7 +118,7 @@ def descompose_x_y(cluster: Cluster) -> tuple[list[float],list[float]]:
     for point in cluster.points:
        x.append(point.coordinates[0])
        y.append(point.coordinates[1])
-    return (x,y)
+    return x, y
 
 
 

@@ -10,10 +10,10 @@ from fuzzy import fuzzy_cmeans
 def descompose_x_y(lista: list[Point]) -> tuple[list[float],list[float]]:
     x = []
     y = []
-    for Point in lista:
-       x.append(Point.coordinates[0])
-       y.append(Point.coordinates[1])
-    return (x,y)
+    for point in lista:
+       x.append(point.coordinates[0])
+       y.append(point.coordinates[1])
+    return x,y
 
 
 def main1():

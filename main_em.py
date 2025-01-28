@@ -18,19 +18,19 @@ def descompose_x_y_x_y(cluster: Cluster) -> tuple[list[float],list[float]]:
 def main1():
     n_clusters = 3  # Número de clusters
     n_points = 40  # Número de points por cluster
-    error = 0.01
+    eps = 0.01
     max_iter = 100
 
     medias = [[0, 0],[5, 5],[-5, 5]]
-    covarianzas = [[[1, 0], [0, 1]],[[1, 0.5], [0.5, 1]],[[1, -0.5], [-0.5, 1]]]
+    covariances = [[[1, 0], [0, 1]],[[1, 0.5], [0.5, 1]],[[1, -0.5], [-0.5, 1]]]
     
     data = []
     for i in range(n_clusters):
-         array_points = np.random.multivariate_normal(medias[i], covarianzas[i], n_points)
+         array_points = np.random.multivariate_normal(medias[i], covariances[i], n_points)
          for coord in array_points:
              data.append(Point(*tuple(coord)))
     
-    list_clusters = em(data,n_clusters, error, max_iter)
+    list_clusters = em(data,n_clusters, eps, max_iter)
     silhouette = silhouette_index(list_clusters)
     print(f"El index de silhouette es: {silhouette} ")
     
