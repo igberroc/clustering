@@ -19,7 +19,7 @@ def initial_parameters(array: np.ndarray, n_clusters: int) -> tuple[np.ndarray, 
     
     Returns
     -------
-    u : array with initial means for each distribution (written as arrays).
+    means : array with initial means for each distribution (written as arrays).
     covariances : array with covariance matrix for each distribution.
     weights: array with probabilities for belonging to each cluster (each distribution).
     """
@@ -58,23 +58,23 @@ def em(data: list[Point], n_clusters: int, eps: float,
     while iter < max_iter and abs(new_log - log) > eps:
         for k in range(n_clusters):
             probability_matrix[:, k] = weights[k] * multivariate_normal.pdf(array, mean = means[k], cov = covariances[k])
-        probability_matrix /= probability_matrix.sum(axis = 1, keepdims = True)
+        probability_matrix /= probability_matrix.sum(axis = 1, keepdims = True)  #Posterior probability (E step).
         n_k = probability_matrix.sum(axis = 0)
-        weights = n_k / n
+        weights = n_k / n       #New weights (M step).
         for k in range(n_clusters):
-            means[k] = (array * probability_matrix[:, k][:, np.newaxis]).sum(axis=0) / n_k[k]
+            means[k] = (array * probability_matrix[:, k][:, np.newaxis]).sum(axis=0) / n_k[k]       #New means.
             dif = array - means[k]
-            covariances[k] = np.dot((probability_matrix[:, k][:, np.newaxis] * dif).T, dif) / n_k[k]
+            covariances[k] = np.dot((probability_matrix[:, k][:, np.newaxis] * dif).T, dif) / n_k[k]    #New covariances.
         log = new_log
         new_log = np.sum(np.log(np.sum([
             weights[k] * multivariate_normal.pdf(array, mean = means[k], cov = covariances[k]) for k in range(n_clusters)
         ], axis=0)))
     list_clusters = [Cluster() for _ in range(n_clusters)]
-    sol = np.argmax(probability_matrix, axis = 1)
+    sol = np.argmax(probability_matrix, axis = 1)    # Index of cluster with maximum probability for each point.
     for i in range(n):
-        Point = data[i]
+        point = data[i]
         j = sol[i]
-        list_clusters[j].add_Point(Point)
+        list_clusters[j].add_point(point)
     return list_clusters
         
         
