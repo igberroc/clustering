@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from puntos import Point, euclidean_distance,Distance,Cluster
+from points import Point, euclidean_distance,Distance,Cluster
 
 def neighbors(data: list[Point], point: Point, eps: float,
             dist: Distance = euclidean_distance) -> list[Point]:

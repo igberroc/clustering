@@ -6,9 +6,9 @@ import pandas as pd
 from sklearn.datasets import make_moons
 import numpy as np
 
-from puntos import Point, Cluster, descompose_x_y
+from points import Point, Cluster, descompose_x_y
 from dbscan import dbscan
-from metricas import silhouette_index, db_index
+from metrics import silhouette_index, db_index
 
 
 

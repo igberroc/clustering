@@ -4,7 +4,7 @@ import seaborn as sns
 import random
 import matplotlib.pyplot as plt
 
-from puntos import Point
+from points import Point
 from fuzzy import fuzzy_cmeans
 
 def descompose_x_y(lista: list[Point]) -> tuple[list[float],list[float]]:

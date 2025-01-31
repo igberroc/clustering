@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 import random
 from sklearn.datasets import make_moons
 
-from kmeans_con_objetos import kmeans
-from puntos import Point, descompose_x_y
-from metricas import silhouette_index, db_index
+from kmeans import kmeans
+from points import Point, descompose_x_y
+from metrics import silhouette_index, db_index
 
 
 def main1():

@@ -2,9 +2,8 @@
 
 import numpy as np
 import copy
-import random
 
-from puntos import Distance, euclidean_distance, Point
+from points import Distance, euclidean_distance, Point
 
 
 def centroids_condition(centroids: list[Point], new_centroids: list[Point],
@@ -57,7 +56,7 @@ def fuzzy_cmeans(data: list[Point], initial_centroids: list[Point], m: int, c: i
     -------
     O(N*(C^2)*I) where N: number of points.
                    C: number of clusters.
-                   I: number of iterations.
+                   I: maximum number of iterations.
 
     """
     n = len(data)

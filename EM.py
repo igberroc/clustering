@@ -5,7 +5,7 @@ import numpy as np
 from scipy.stats import multivariate_normal
 
 
-from puntos import Cluster, Point
+from points import Cluster, Point
 
 def initial_parameters(array: np.ndarray, n_clusters: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
@@ -24,7 +24,7 @@ def initial_parameters(array: np.ndarray, n_clusters: int) -> tuple[np.ndarray, 
     weights: array with probabilities for belonging to each cluster (each distribution).
     """
     d = len(array[0])
-    n = array.size()
+    n = len(array)
     means = array[np.random.choice(n, n_clusters, replace=False)]
     covariances = [np.eye(d) for _ in range(n_clusters)]
     weights = np.ones(n_clusters) / n_clusters
@@ -47,6 +47,13 @@ def em(data: list[Point], n_clusters: int, eps: float,
     Returns
     -------
     list_clusters: list with final clusters.
+
+    Complexity
+    -------
+    O(N*K*D^2*I) where N: number of points.
+                       K: number of clusters.
+                       D: dimension of the points.
+                       I: maximum number of iterations.
     """
     array = np.array([list(point.get_coordinates()) for point in data])
     n = len(data)
