@@ -8,7 +8,7 @@ import numpy as np
 
 from points import Point, Cluster, descompose_x_y
 from dbscan import dbscan
-from metrics import silhouette_index, db_index
+from metrics import silhouette_index, db_index, c_index
 
 
 
@@ -43,6 +43,9 @@ def main1():
     db = db_index(list_clusters)
     print(f"The Davies-Bouldin index is: {db} ")
 
+    c = c_index(data, list_clusters)
+    print(f"The C-index is: {c} ")
+
     (x,y) = descompose_x_y(noise)
     plt.scatter(x,y, s = 10, color = 'black')
 
@@ -75,6 +78,9 @@ def main2():
     
     db = db_index(list_clusters)
     print(f"The Davies-Bouldin index is: {db} ")
+
+    c = c_index(data, list_clusters)
+    print(f"The C-index is: {c} ")
 
     (x,y) = descompose_x_y(noise)
     plt.plot(x,y, 'o', color = 'black')
@@ -120,6 +126,9 @@ def main3():
     
     db = db_index(list_clusters)
     print(f"The Davies-Bouldin index is: {db} ")
+
+    c = c_index(data, list_clusters)
+    print(f"The C-index is: {c} ")
 
     (x,y) = descompose_x_y(noise)
     plt.plot(x,y, 'o', color = 'black')

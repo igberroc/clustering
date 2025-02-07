@@ -8,7 +8,7 @@ from sklearn.datasets import make_moons
 
 from kmeans import kmeans
 from points import Point, descompose_x_y
-from metrics import silhouette_index, db_index
+from metrics import silhouette_index, db_index, c_index
 
 
 def main1():
@@ -26,6 +26,9 @@ def main1():
     
     db = db_index(list_clusters)
     print(f"The Davies-Bouldin index is: {db} ")
+
+    c = c_index(data, list_clusters)
+    print(f"The C-index is: {c} ")
 
     (x1,y1) = descompose_x_y(list_clusters[0])
     (x2,y2) = descompose_x_y(list_clusters[1])
@@ -57,6 +60,9 @@ def main2():
     
     db = db_index(list_clusters)
     print(f"The Davies-Bouldin index is: {db} ")
+
+    c = c_index(data, list_clusters)
+    print(f"The C-index is: {c} ")
 
     (x1,y1) = descompose_x_y(list_clusters[0])
     (x2,y2) = descompose_x_y(list_clusters[1])

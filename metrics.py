@@ -3,7 +3,8 @@
 
 from points import Distance, euclidean_distance, Point, Cluster
 import math
-
+import copy
+import numpy as np
 
 def min_dist_point_cluster(point: Point, list_cluster: list[Cluster],
                               dist: Distance = euclidean_distance) -> float:
@@ -151,7 +152,48 @@ def db_index(list_cluster: list[Cluster], dist: Distance = euclidean_distance) -
     return index / k
                 
                 
-    
+def s_w(list_cluster: list[Cluster], dist: Distance = euclidean_distance) -> tuple[float, int]:
+    sol = 0
+    m = 0
+    for cluster in list_cluster:
+        m += cluster.size()*(cluster.size()-1)//2
+        set_points = cluster.points.copy()
+        while len(set_points) != 1:
+            point = set_points.pop()
+            for point_in in set_points:
+                sol += dist(point,point_in)
+
+    return (sol, m)
+
+def s_max_min(data: list[Point], m: int, dist: Distance = euclidean_distance) -> tuple[float,float]:
+    n_pairs = len(data)*(len(data)-1)//2
+    array_dist = np.zeros(n_pairs)
+    k = 0
+    for i in range(len(data)):
+        point = data[i]
+        for j in range(i+1,len(data)):
+            point2 = data[j]
+            array_dist[k] = dist(point,point2)
+            k += 1
+    minimum_dist = np.partition(array_dist, m)[:m]
+    maximum_dist = np.partition(array_dist, -m)[-m:]
+    return np.sum(minimum_dist), np.sum(maximum_dist)
+
+
+
+def c_index(data: list[Point], list_cluster: list[Cluster], dist: Distance = euclidean_distance) -> float:
+    (s, m) = s_w(list_cluster, dist)
+    s_min, s_max = s_max_min(data, m, dist)
+    return (s - s_min) / (s_max - s_min)
+
+
+
+
+
+
+
+
+
         
         
         
