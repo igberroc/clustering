@@ -153,6 +153,19 @@ def db_index(list_cluster: list[Cluster], dist: Distance = euclidean_distance) -
                 
                 
 def s_w(list_cluster: list[Cluster], dist: Distance = euclidean_distance) -> tuple[float, int]:
+    """
+    Given a list of clusters, returns the sum of the distances between all the pairs of points in
+    the same cluster, and the number of pairs in the same cluster.
+
+    Parameters
+    ----------
+    list_cluster: list of clusters.
+    dist: distance to use.
+
+    Returns
+    -------
+    sum of the distances between all the pairs of points in the same cluster, and the number of pairs in the clusters.
+    """
     sol = 0
     m = 0
     for cluster in list_cluster:
@@ -166,6 +179,21 @@ def s_w(list_cluster: list[Cluster], dist: Distance = euclidean_distance) -> tup
     return (sol, m)
 
 def s_max_min(data: list[Point], m: int, dist: Distance = euclidean_distance) -> tuple[float,float]:
+    """
+    Given the set of data and the number of pairs in the clusters (m) , returns the sum of the m minimum distances
+    and the sum of the m maximum distances between all the pairs of points in the set of data.
+
+    Parameters
+    ----------
+    data: set of data.
+    m: number of pairs in the clusters.
+    dist: distance to use.
+
+    Returns
+    -------
+    sum of the m minimum distances and the sum of the m maximum distances.
+    """
+
     n_pairs = len(data)*(len(data)-1)//2
     array_dist = np.zeros(n_pairs)
     k = 0
@@ -182,6 +210,19 @@ def s_max_min(data: list[Point], m: int, dist: Distance = euclidean_distance) ->
 
 
 def c_index(data: list[Point], list_cluster: list[Cluster], dist: Distance = euclidean_distance) -> float:
+    """
+    Given a set of data and a list of clusters, returns the c-index.
+
+    Parameters
+    ----------
+    data: set of data.
+    list_cluster: list of clusters.
+    dist: distance to use.
+
+    Returns
+    -------
+    c-index: between 0 and 1, the closer to 0, the better classification.
+    """
     (s, m) = s_w(list_cluster, dist)
     s_min, s_max = s_max_min(data, m, dist)
     return (s - s_min) / (s_max - s_min)
