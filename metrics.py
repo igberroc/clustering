@@ -205,7 +205,7 @@ def s_max_min(data: list[Point], m: int, dist: Distance = euclidean_distance) ->
             k += 1
     minimum_dist = np.partition(array_dist, m)[:m]
     maximum_dist = np.partition(array_dist, -m)[-m:]
-    return np.sum(minimum_dist), np.sum(maximum_dist)
+    return float(np.sum(minimum_dist)), float(np.sum(maximum_dist))
 
 
 
@@ -225,6 +225,8 @@ def c_index(data: list[Point], list_cluster: list[Cluster], dist: Distance = euc
     """
     (s, m) = s_w(list_cluster, dist)
     s_min, s_max = s_max_min(data, m, dist)
+    if s_min == s_max:
+        return 0
     return (s - s_min) / (s_max - s_min)
 
 

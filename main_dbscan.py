@@ -17,7 +17,7 @@ def random_color():
 
 
 def main1():
-    df = pd.read_csv('C:/Users/nacho/Downloads/dataset_dbscan.csv')
+    df = pd.read_csv('dataset_dbscan.csv')
     list_x = df['Weight'].tolist()
     list_y = df['Height'].tolist()
     data = []
@@ -56,7 +56,7 @@ def main1():
     plt.show()
     
 def main2():
-    dataset, y = make_moons(n_samples=300, noise=0.1, random_state=42)
+    dataset, y = make_moons(n_samples = 300 , noise = 0.1, random_state = 42)
     data = []
     for [i,j] in dataset:
         data.append(Point(i,j))
@@ -139,8 +139,7 @@ def main3():
     plt.legend()
     plt.show()
         
-        
-   
+
 
 
 
