@@ -93,7 +93,6 @@ def lance_williams(matrix:np.ndarray, l:int, i:int, j:int, a:float, b:float, c:f
     return a*lw1 + b*lw2 + c*lw3 + d*abs(lw1 - lw2)
  
 
-
 def agglomerative(data: list[Point], a:float, b:float, c:float, d:float, max_dist: float = 0,
                   dist: Distance = euclidean_distance) -> tuple[np.ndarray, list[Cluster]]:
     """
@@ -131,7 +130,7 @@ def agglomerative(data: list[Point], a:float, b:float, c:float, d:float, max_dis
     (matrix, minimum, (i,j)) = proximity_matrix(data, dist)
     for k in range(n):
         cluster = Cluster({data[k]})
-        list_clusters[k] = ((cluster,k))
+        list_clusters[k] = (cluster,k)
         result.append(cluster)
     for s in range(n-1):
         if s != 0:
