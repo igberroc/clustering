@@ -5,7 +5,7 @@ import numpy as np
 
 from EM import em
 from metrics import silhouette_index, db_index
-from points import Point, Cluster, descompose_x_y
+from points import Point, descompose_x_y
 
 def main1():
     n_clusters = 3
@@ -42,7 +42,7 @@ def main1():
     plt.legend()
     plt.show()
     
-    
+
     
  
     
