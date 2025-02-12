@@ -31,8 +31,8 @@ def initial_parameters(array: np.ndarray, n_clusters: int) -> tuple[np.ndarray, 
     return means, covariances, weights
 
 
-def em(data: list[Point], n_clusters: int, eps: float,
-       max_iter: int) -> list[Cluster]:
+def em(data: list[Point], n_clusters: int, initial_covariances: list[np.ndarray],
+       eps: float, max_iter: int) -> list[Cluster]:
     """
     Given a set of data, the number of clusters, and conditions for the loop´s body,
     returns the list of the clusters.
@@ -57,7 +57,9 @@ def em(data: list[Point], n_clusters: int, eps: float,
     """
     array = np.array([list(point.get_coordinates()) for point in data])
     n = len(data)
-    (means, covariances, weights) = initial_parameters(array, n_clusters)
+    weights = np.ones(n_clusters) / n_clusters
+    covariances = initial_covariances
+    means = array[np.random.choice(n, n_clusters, replace=False)]
     probability_matrix = np.zeros((n, n_clusters))
     log = 0
     new_log = -np.inf
@@ -76,6 +78,7 @@ def em(data: list[Point], n_clusters: int, eps: float,
         new_log = np.sum(np.log(np.sum([
             weights[k] * multivariate_normal.pdf(array, mean = means[k], cov = covariances[k]) for k in range(n_clusters)
         ], axis=0)))
+        iter += 1
     list_clusters = [Cluster() for _ in range(n_clusters)]
     sol = np.argmax(probability_matrix, axis = 1)    # Index of cluster with maximum probability for each point.
     for i in range(n):

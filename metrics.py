@@ -3,11 +3,10 @@
 
 from points import Distance, euclidean_distance, Point, Cluster
 import math
-import copy
 import numpy as np
 
-def min_dist_point_cluster(point: Point, list_cluster: list[Cluster],
-                              dist: Distance = euclidean_distance) -> float:
+def min_dist_point_cluster(point: Point, list_clusters: list[Cluster],
+                           dist: Distance = euclidean_distance) -> float:
     """
     Given a point and a list of clusters, returns the minimum distance between the point and a clusters,
     where the distance between a point and a cluster is the average distance between the point and all the points.
@@ -15,7 +14,7 @@ def min_dist_point_cluster(point: Point, list_cluster: list[Cluster],
     Parameters
     ----------
     point: a point.
-    list_cluster: list of clusters.
+    list_clusters: list of clusters.
     dist: distance to use.
 
     Returns
@@ -24,7 +23,7 @@ def min_dist_point_cluster(point: Point, list_cluster: list[Cluster],
     """
     minimum = math.inf
     b = 0
-    for cluster in list_cluster:
+    for cluster in list_clusters:
         for point_in in cluster.points:
             b += dist(point,point_in)
         b = b / cluster.size()
@@ -78,13 +77,13 @@ def silhouette_index_point(point: Point, own_cluster: Cluster,
     return index
 
 # -1 indica mala clasficacion, 1 indica buena clasificacion
-def silhouette_index(list_cluster: list[Cluster], dist: Distance = euclidean_distance) -> float:
+def silhouette_index(list_clusters: list[Cluster], dist: Distance = euclidean_distance) -> float:
     """
     Given a list of clusters, returns the silhouette index.
 
     Parameters
     ----------
-    list_cluster: list of clusters.
+    list_clusters: list of clusters.
     dist: distance to use.
 
     Returns
@@ -93,12 +92,12 @@ def silhouette_index(list_cluster: list[Cluster], dist: Distance = euclidean_dis
     """
     num_points = 0
     index = 0
-    for _ in range(len(list_cluster)):
-        cluster = list_cluster.pop(0)
+    for _ in range(len(list_clusters)):
+        cluster = list_clusters.pop(0)
         for point in cluster.points:
-            index += silhouette_index_point(point, cluster, list_cluster, dist)
+            index += silhouette_index_point(point, cluster, list_clusters, dist)
         num_points += cluster.size()
-        list_cluster.append(cluster)
+        list_clusters.append(cluster)
     return index / num_points
         
     
@@ -121,24 +120,24 @@ def cluster_dispersion(cluster: Cluster, dist: Distance = euclidean_distance) ->
     return dispersion / cluster.size(),centroid
 
 
-def db_index(list_cluster: list[Cluster], dist: Distance = euclidean_distance) -> float:
+def db_index(list_clusters: list[Cluster], dist: Distance = euclidean_distance) -> float:
     """
     Given a list of clusters, returns the db index.
 
     Parameters
     ----------
-    list_cluster: list of clusters.
+    list_clusters: list of clusters.
     dist: distance to use.
 
     Returns
     -------
     db index: between 0 and infinite, the closer to 0, the better classification.
     """
-    k = len(list_cluster)
+    k = len(list_clusters)
     list_dispersion = []
     list_centroids = []
     index = 0
-    for cluster in list_cluster:
+    for cluster in list_clusters:
         (dispersion, centroid) = cluster_dispersion(cluster,dist)
         list_dispersion.append(dispersion)
         list_centroids.append(centroid)
@@ -152,14 +151,14 @@ def db_index(list_cluster: list[Cluster], dist: Distance = euclidean_distance) -
     return index / k
                 
                 
-def s_w(list_cluster: list[Cluster], dist: Distance = euclidean_distance) -> tuple[float, int]:
+def s_w(list_clusters: list[Cluster], dist: Distance = euclidean_distance) -> tuple[float, int]:
     """
     Given a list of clusters, returns the sum of the distances between all the pairs of points in
     the same cluster, and the number of pairs in the same cluster.
 
     Parameters
     ----------
-    list_cluster: list of clusters.
+    list_clusters: list of clusters.
     dist: distance to use.
 
     Returns
@@ -168,7 +167,7 @@ def s_w(list_cluster: list[Cluster], dist: Distance = euclidean_distance) -> tup
     """
     sol = 0
     m = 0
-    for cluster in list_cluster:
+    for cluster in list_clusters:
         m += cluster.size()*(cluster.size()-1)//2
         set_points = cluster.points.copy()
         while len(set_points) != 1:
@@ -176,7 +175,7 @@ def s_w(list_cluster: list[Cluster], dist: Distance = euclidean_distance) -> tup
             for point_in in set_points:
                 sol += dist(point,point_in)
 
-    return (sol, m)
+    return sol, m
 
 def s_max_min(data: list[Point], m: int, dist: Distance = euclidean_distance) -> tuple[float,float]:
     """
@@ -209,21 +208,21 @@ def s_max_min(data: list[Point], m: int, dist: Distance = euclidean_distance) ->
 
 
 
-def c_index(data: list[Point], list_cluster: list[Cluster], dist: Distance = euclidean_distance) -> float:
+def c_index(data: list[Point], list_clusters: list[Cluster], dist: Distance = euclidean_distance) -> float:
     """
     Given a set of data and a list of clusters, returns the c-index.
 
     Parameters
     ----------
     data: set of data.
-    list_cluster: list of clusters.
+    list_clusters: list of clusters.
     dist: distance to use.
 
     Returns
     -------
     c-index: between 0 and 1, the closer to 0, the better classification.
     """
-    (s, m) = s_w(list_cluster, dist)
+    (s, m) = s_w(list_clusters, dist)
     s_min, s_max = s_max_min(data, m, dist)
     if s_min == s_max:
         return 0
