@@ -17,7 +17,6 @@ from EM import em
 
 
 
-
 def main1():
     df = pd.read_csv('wine_dataset.csv')
     df_tuples = df.itertuples(index = False, name = None)
@@ -167,11 +166,11 @@ def main2():
     silhouette = silhouette_index(list_clusters)
     db = db_index(list_clusters)
     c = c_index(data, list_clusters)
-    results.append(['Fuzzy(m = 1.25, eps = 0.001, max_iter = 100', silhouette, db, c, t1 - t0])
-    print(results)
+    results.append(['Fuzzy(m = 1.25, eps = 0.001, max_iter = 100)', silhouette, db, c, t1 - t0])
+
 
     #DBSCAN
-    test_parameters = [(40,7), (50,13), (47,8)]
+    test_parameters = [(3,2), (2.5,2), (2.8,2)]
     for (eps, min_points) in test_parameters:
         t0 = perf_counter()
         (list_clusters, noise) = dbscan(data, eps, min_points)
@@ -182,15 +181,7 @@ def main2():
         results.append([f'DBSCAN (eps = {eps}, min_points = {min_points})', silhouette, db, c, t1 - t0])
 
     #EM
-    """
-    array = np.array([list(point.get_coordinates()) for point in data])
-    media = np.mean(array, axis = 0)
-    print(media)
-    varianza = np.var(array, axis = 0, ddof = 0)
-    print(varianza)
-    """
-    cov_matrix = np.diag([1,1,1,10,100,1,1,1,1,1,1,1,10000])
-    initial_covariances = [12_000*np.eye(13) for _ in range(3)]
+    initial_covariances = [np.eye(13) for _ in range(3)]
     t0 = perf_counter()
     list_clusters = em(data,3, initial_covariances,1e-20,100)
     t1 = perf_counter()
@@ -203,7 +194,7 @@ def main2():
     df_results = pd.DataFrame(results,
                               columns=["Algorithm", "Silhouette index", "Davies-Bouldin index","C-index", "Time(s)"])
     plt.figure(figsize=(10, 4))
-    plt.title("Wine clustering", fontsize=14, fontweight='bold')
+    plt.title("Wine clustering (standardized data)", fontsize=14, fontweight='bold')
     ax = plt.gca()
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
@@ -218,7 +209,7 @@ def main2():
     plt.show()
 
 
-main2()
+
 
 
 
