@@ -90,10 +90,7 @@ class Cluster:
     
     def clear(self) -> None:
         self.points = set()
-    
-    def num_points(self) -> int:
-        return len(self.points)
-    
+
     def copy_cluster(self) -> Self:
         cluster = Cluster()
         cluster.points = self.points.copy()

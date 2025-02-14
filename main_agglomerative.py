@@ -7,8 +7,7 @@ from sklearn.datasets import load_iris
 import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import dendrogram
 
-
-from agglomerative import agglomerative
+from agglomerative import agglomerative, single, complete, ward, average
 from points import Point
 from metrics import silhouette_index, db_index
 
@@ -21,7 +20,7 @@ def main1():
     data4 = [Point(0 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
     data = data1 + data2 + data3 + data4
     
-    (linkage_matrix,result) = agglomerative(data,0.5,0.5,0,-0.5,0.4)
+    (linkage_matrix,result) = agglomerative(data, average, 0.6)
     silhouette = silhouette_index(result)
     print(f"The Silhouette index is: {silhouette} ")
     
@@ -44,7 +43,8 @@ def main2():
         p = Point()
         p.coordinates = tuple(elem)
         data.append(p)
-    (linkage_matrix,result) = agglomerative(data,0.5,0.5,0,-0.5,1)
+    (linkage_matrix,result) = agglomerative(data,ward,10)
+    print(len(result))
     
     silhouette = silhouette_index(result)
     print(f"The silhouette index is: {silhouette} ")
@@ -59,4 +59,4 @@ def main2():
     plt.show()
 
     
-main2()
+
