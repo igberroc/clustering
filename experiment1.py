@@ -1,3 +1,5 @@
+import sys
+
 
 from sklearn.preprocessing import StandardScaler
 from time import perf_counter
@@ -10,7 +12,7 @@ import numpy as np
 from points import Point, Cluster
 from kmeans import kmeans
 from metrics import silhouette_index, db_index, c_index
-from agglomerative import agglomerative
+from agglomerative import agglomerative, complete
 from fuzzy import fuzzy_cmeans
 from dbscan import dbscan
 from EM import em
@@ -28,7 +30,7 @@ def main1():
 
     #KMEANS
     t0 = perf_counter()
-    list_clusters = kmeans(data,3,0.001,100)
+    list_clusters = kmeans(data, 3, 0.001, 100)
     t1 = perf_counter()
     silhouette = silhouette_index(list_clusters)
     db = db_index(list_clusters)
@@ -37,18 +39,18 @@ def main1():
 
     #AGGLOMERATIVE
     t0 = perf_counter()
-    (linkage_matrix, list_clusters) = agglomerative(data, 0.5, 0.5, 0, 0.5, 550)
+    (linkage_matrix, list_clusters) = agglomerative(data, complete, 550)
     t1 = perf_counter()
     silhouette = silhouette_index(list_clusters)
     db = db_index(list_clusters)
     c = c_index(data, list_clusters)
     results.append(['Agglomerative(complete linkage, max_dist = 550) ', silhouette, db, c, t1 - t0])
 
-    plt.figure()
-    dendrogram(linkage_matrix)
+    fig, ax = plt.subplots()
+    dendrogram(linkage_matrix, ax = ax)
     plt.xlabel("clusters indexes")
     plt.ylabel("distance between clusters")
-    plt.show()
+    fig.savefig("dendogram.svg")
 
     #FUZZY
     initial_centroids = [0 for _ in range(3)]
@@ -208,10 +210,8 @@ def main2():
     table.auto_set_column_width([0, 1, 2, 3, 4])
     plt.show()
 
-
-
-
-
-
-
-
+if __name__ == '__main__':
+    if sys.argv[1] == '1':
+        main1()
+    elif sys.argv[1] == '2':
+        main2()
