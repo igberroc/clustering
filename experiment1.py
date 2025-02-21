@@ -10,7 +10,7 @@ import numpy as np
 from points import Point, Cluster
 from kmeans import kmeans
 from metrics import silhouette_index, db_index, c_index
-from agglomerative import agglomerative
+from agglomerative import agglomerative, complete, average
 from fuzzy import fuzzy_cmeans
 from dbscan import dbscan
 from EM import em
@@ -37,18 +37,19 @@ def main1():
 
     #AGGLOMERATIVE
     t0 = perf_counter()
-    (linkage_matrix, list_clusters) = agglomerative(data, 0.5, 0.5, 0, 0.5, 550)
+    (linkage_matrix, list_clusters) = agglomerative(data, complete, 550)
     t1 = perf_counter()
     silhouette = silhouette_index(list_clusters)
     db = db_index(list_clusters)
     c = c_index(data, list_clusters)
     results.append(['Agglomerative(complete linkage, max_dist = 550) ', silhouette, db, c, t1 - t0])
 
-    plt.figure()
-    dendrogram(linkage_matrix)
+    plt.figure(figsize = (10, 4))
+    dendrogram(linkage_matrix, leaf_rotation = 90, leaf_font_size = 3)
     plt.xlabel("clusters indexes")
     plt.ylabel("distance between clusters")
-    plt.show()
+    plt.savefig("dendrogram1.svg", format = "svg")
+
 
     #FUZZY
     initial_centroids = [0 for _ in range(3)]
@@ -112,7 +113,7 @@ def main1():
     table.auto_set_font_size(False)
     table.set_fontsize(10)
     table.auto_set_column_width([0, 1, 2, 3, 4])
-    plt.show()
+    plt.savefig("results1.svg", format = "svg")
 
 def main2():
     df = pd.read_csv('wine_dataset.csv')
@@ -138,7 +139,7 @@ def main2():
 
     #AGGLOMERATIVE
     t0 = perf_counter()
-    (linkage_matrix, list_clusters) = agglomerative(data, 0.5, 0.5, 0, 0, 6.5)
+    (linkage_matrix, list_clusters) = agglomerative(data, average, 6.5)
     t1 = perf_counter()
     silhouette = silhouette_index(list_clusters)
     db = db_index(list_clusters)
@@ -208,10 +209,7 @@ def main2():
     table.auto_set_column_width([0, 1, 2, 3, 4])
     plt.show()
 
-
-
-
-
+main1()
 
 
 
