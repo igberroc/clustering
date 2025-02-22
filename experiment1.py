@@ -7,7 +7,7 @@ import random
 import numpy as np
 
 from points import Point
-from agglomerative import complete, average
+from agglomerative import median, complete, average
 from test_functions import kmeans_test, agglomerative_test, fuzzy_test, dbscan_test, em_test, table_plot
 
 
@@ -22,8 +22,11 @@ def main1():
     kmeans_results = kmeans_test(data, 3, 0.001, 100)
     results.append(kmeans_results)
 
-    agglomerative_results, linkage_matrix = agglomerative_test(data, complete, 550)
-    results.append(agglomerative_results)
+    agglomerative_results1, linkage_matrix1 = agglomerative_test(data, complete, 550)
+    results.append(agglomerative_results1)
+
+    agglomerative_results2, linkage_matrix2 = agglomerative_test(data, median, 300)
+    results.append(agglomerative_results2)
 
     initial_centroids = []
     for _ in range(3):
@@ -44,10 +47,15 @@ def main1():
     results.append(em_results)
 
     #Plots
-    plt.figure(figsize = (10, 4))
-    dendrogram(linkage_matrix, leaf_rotation = 90, leaf_font_size = 3)
-    plt.xlabel("clusters indexes")
-    plt.ylabel("distance between clusters")
+    fig, axes = plt.subplots(1, 2, figsize = (20, 4))
+    dendrogram(linkage_matrix1, ax = axes[0], leaf_rotation = 90, leaf_font_size = 3)
+    axes[0].set_title("Complete linkage")
+    axes[0].set_xlabel("cluster indexes")
+    axes[0].set_ylabel("distance between clusters")
+    dendrogram(linkage_matrix2, ax=axes[1], leaf_rotation = 90, leaf_font_size = 3)
+    axes[1].set_title("Median linkage")
+    axes[1].set_xlabel("cluster indexes")
+    axes[1].set_ylabel("distance between clusters")
     plt.savefig("dendrogram1.svg", format = "svg")
 
     table_plot(results, "Wine clustering", "results1.svg")
