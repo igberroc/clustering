@@ -1,20 +1,14 @@
 
 from sklearn.preprocessing import StandardScaler
-from time import perf_counter
 import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import dendrogram
 import pandas as pd
 import random
 import numpy as np
 
-from points import Point, Cluster
-from kmeans import kmeans
-from metrics import silhouette_index, db_index, c_index
-from agglomerative import agglomerative, complete, average
-from fuzzy import fuzzy_cmeans
-from dbscan import dbscan
-from EM import em
-
+from points import Point
+from agglomerative import complete, average
+from test_functions import kmeans_test, agglomerative_test, fuzzy_test, dbscan_test, em_test, table_plot
 
 
 def main1():
@@ -23,98 +17,42 @@ def main1():
     data = []
     for point_coordinates in df_tuples:
         data.append(Point(*point_coordinates))
-
     results = []
 
-    #KMEANS
-    t0 = perf_counter()
-    list_clusters = kmeans(data,3,0.001,100)
-    t1 = perf_counter()
-    silhouette = silhouette_index(list_clusters)
-    db = db_index(list_clusters)
-    c = c_index(data, list_clusters)
-    results.append(['KMeans(eps = 0.001, max_iter = 100)', silhouette, db, c, t1 - t0])
+    kmeans_results = kmeans_test(data, 3, 0.001, 100)
+    results.append(kmeans_results)
 
-    #AGGLOMERATIVE
-    t0 = perf_counter()
-    (linkage_matrix, list_clusters) = agglomerative(data, complete, 550)
-    t1 = perf_counter()
-    silhouette = silhouette_index(list_clusters)
-    db = db_index(list_clusters)
-    c = c_index(data, list_clusters)
-    results.append(['Agglomerative(complete linkage, max_dist = 550) ', silhouette, db, c, t1 - t0])
+    agglomerative_results, linkage_matrix = agglomerative_test(data, complete, 550)
+    results.append(agglomerative_results)
 
+    initial_centroids = []
+    for _ in range(3):
+        point_coordinates = tuple([random.uniform(-2, 2) for _ in range(13)])
+        initial_centroids.append(Point(*point_coordinates))
+    fuzzy_results = fuzzy_test(data, initial_centroids, 2, 3, 0.001, 100)
+    results.append(fuzzy_results)
+
+    test_parameters = [(40,7), (50,13), (47,8)]
+    for (eps, min_points) in test_parameters:
+        dbscan_results = dbscan_test(data, eps, min_points)
+        results.append(dbscan_results)
+    """
+    initial_covariances = np.diag([1,1,1,10,100,1,1,1,1,1,1,1,10000])   (variance estimations)
+    """
+    initial_covariances = [12_000 * np.eye(13) for _ in range(3)]
+    em_results = em_test(data, 3, initial_covariances, 1e-20, 100)
+    results.append(em_results)
+
+    #Plots
     plt.figure(figsize = (10, 4))
     dendrogram(linkage_matrix, leaf_rotation = 90, leaf_font_size = 3)
     plt.xlabel("clusters indexes")
     plt.ylabel("distance between clusters")
     plt.savefig("dendrogram1.svg", format = "svg")
 
+    table_plot(results, "Wine clustering", "results1.svg")
 
-    #FUZZY
-    initial_centroids = [0 for _ in range(3)]
-    for i in range(3):
-        point_coordinates = tuple([random.uniform(-2, 2) for _ in range(13)])
-        initial_centroids[i] = Point(*point_coordinates)
-    t0 = perf_counter()
-    membership_matrix = fuzzy_cmeans(data, initial_centroids, 2, 3, 0.001, 100)
-    t1 = perf_counter()
-    list_clusters = [Cluster() for _ in range(3)]
-    for i in range(len(data)):
-        max_index = np.argmax(membership_matrix[:,i])
-        list_clusters[max_index].add_point(data[i])
-    silhouette = silhouette_index(list_clusters)
-    db = db_index(list_clusters)
-    c = c_index(data, list_clusters)
-    results.append(['Fuzzy(m = 2, eps = 0.001, max_iter = 100)', silhouette, db, c, t1 - t0])
-
-    #DBSCAN
-    test_parameters = [(40,7), (50,13), (47,8)]
-    for (eps, min_points) in test_parameters:
-        t0 = perf_counter()
-        (list_clusters, noise) = dbscan(data, eps, min_points)
-        t1 = perf_counter()
-        silhouette = silhouette_index(list_clusters)
-        db = db_index(list_clusters)
-        c = c_index(data, list_clusters)
-        results.append([f'DBSCAN (eps = {eps}, min_points = {min_points})', silhouette, db, c, t1 - t0])
-
-    #EM
-    """
-    array = np.array([list(point.get_coordinates()) for point in data])
-    media = np.mean(array, axis = 0)
-    print(media)
-    varianza = np.var(array, axis = 0, ddof = 0)
-    print(varianza)
-    """
-    cov_matrix = np.diag([1,1,1,10,100,1,1,1,1,1,1,1,10000])
-    initial_covariances = [12_000*np.eye(13) for _ in range(3)]
-    t0 = perf_counter()
-    list_clusters = em(data,3, initial_covariances,1e-20,100)
-    t1 = perf_counter()
-    silhouette = silhouette_index(list_clusters)
-    db = db_index(list_clusters)
-    c = c_index(data, list_clusters)
-    results.append(['EM', silhouette, db, c, t1 - t0])
-
-    #Results
-    df_results = pd.DataFrame(results,
-                              columns=["Algorithm", "Silhouette index", "Davies-Bouldin index","C-index", "Time(s)"])
-    plt.figure(figsize=(10, 4))
-    plt.title("Wine clustering", fontsize=14, fontweight='bold')
-    ax = plt.gca()
-    ax.xaxis.set_visible(False)
-    ax.yaxis.set_visible(False)
-    ax.set_frame_on(False)
-    table = plt.table(cellText=df_results.round(3).values,
-                      colLabels=df_results.columns,
-                      cellLoc='center',
-                      loc='center')
-    table.auto_set_font_size(False)
-    table.set_fontsize(10)
-    table.auto_set_column_width([0, 1, 2, 3, 4])
-    plt.savefig("results1.svg", format = "svg")
-
+#Standarized data
 def main2():
     df = pd.read_csv('wine_dataset.csv')
     scaler = StandardScaler()
@@ -125,91 +63,52 @@ def main2():
     data = []
     for point_coordinates in df_tuples:
         data.append(Point(*point_coordinates))
-
     results = []
 
-    #KMEANS
-    t0 = perf_counter()
-    list_clusters = kmeans(data,3,0.001,100)
-    t1 = perf_counter()
-    silhouette = silhouette_index(list_clusters)
-    db = db_index(list_clusters)
-    c = c_index(data, list_clusters)
-    results.append(['KMeans(eps = 0.001, max_iter = 100)', silhouette, db, c, t1 - t0])
+    kmeans_results = kmeans_test(data, 3, 0.001, 100)
+    results.append(kmeans_results)
 
-    #AGGLOMERATIVE
-    t0 = perf_counter()
-    (linkage_matrix, list_clusters) = agglomerative(data, average, 6.5)
-    t1 = perf_counter()
-    silhouette = silhouette_index(list_clusters)
-    db = db_index(list_clusters)
-    c = c_index(data, list_clusters)
-    results.append(['Agglomerative(average linkage, max_dist = 6.5) ', silhouette, db, c, t1 - t0])
+    agglomerative_results, linkage_matrix = agglomerative_test(data, average, 6.5)
+    results.append(agglomerative_results)
 
-    plt.figure()
-    dendrogram(linkage_matrix)
-    plt.xlabel("clusters indexes")
-    plt.ylabel("distance between clusters")
-    plt.show()
-
-    #FUZZY
     initial_centroids = [0 for _ in range(3)]
     for i in range(3):
         point_coordinates = tuple([random.uniform(-2, 2) for _ in range(13)])
         initial_centroids[i] = Point(*point_coordinates)
-    t0 = perf_counter()
-    membership_matrix = fuzzy_cmeans(data, initial_centroids, 1.25, 3, 0.001, 100)
-    t1 = perf_counter()
-    list_clusters = [Cluster() for _ in range(3)]
-    for i in range(len(data)):
-        max_index = np.argmax(membership_matrix[:,i])
-        list_clusters[max_index].add_point(data[i])
-    silhouette = silhouette_index(list_clusters)
-    db = db_index(list_clusters)
-    c = c_index(data, list_clusters)
-    results.append(['Fuzzy(m = 1.25, eps = 0.001, max_iter = 100)', silhouette, db, c, t1 - t0])
+    fuzzy_results = fuzzy_test(data, initial_centroids, 1.25, 3, 0.001, 100)
+    results.append(fuzzy_results)
 
-
-    #DBSCAN
     test_parameters = [(3,2), (2.5,2), (2.8,2)]
     for (eps, min_points) in test_parameters:
-        t0 = perf_counter()
-        (list_clusters, noise) = dbscan(data, eps, min_points)
-        t1 = perf_counter()
-        silhouette = silhouette_index(list_clusters)
-        db = db_index(list_clusters)
-        c = c_index(data, list_clusters)
-        results.append([f'DBSCAN (eps = {eps}, min_points = {min_points})', silhouette, db, c, t1 - t0])
+        dbscan_results = dbscan_test(data, eps, min_points)
+        results.append(dbscan_results)
 
-    #EM
     initial_covariances = [np.eye(13) for _ in range(3)]
-    t0 = perf_counter()
-    list_clusters = em(data,3, initial_covariances,1e-20,100)
-    t1 = perf_counter()
-    silhouette = silhouette_index(list_clusters)
-    db = db_index(list_clusters)
-    c = c_index(data, list_clusters)
-    results.append(['EM', silhouette, db, c, t1 - t0])
+    em_results = em_test(data, 3, initial_covariances, 1e-20, 100)
+    results.append(em_results)
 
-    #Results
-    df_results = pd.DataFrame(results,
-                              columns=["Algorithm", "Silhouette index", "Davies-Bouldin index","C-index", "Time(s)"])
-    plt.figure(figsize=(10, 4))
-    plt.title("Wine clustering (standardized data)", fontsize=14, fontweight='bold')
-    ax = plt.gca()
-    ax.xaxis.set_visible(False)
-    ax.yaxis.set_visible(False)
-    ax.set_frame_on(False)
-    table = plt.table(cellText=df_results.round(3).values,
-                      colLabels=df_results.columns,
-                      cellLoc='center',
-                      loc='center')
-    table.auto_set_font_size(False)
-    table.set_fontsize(10)
-    table.auto_set_column_width([0, 1, 2, 3, 4])
-    plt.show()
+    #Plots
+    plt.figure(figsize = (10, 4))
+    dendrogram(linkage_matrix, leaf_rotation = 90, leaf_font_size = 3)
+    plt.xlabel("clusters indexes")
+    plt.ylabel("distance between clusters")
+    plt.savefig("dendrogram2.svg", format = "svg")
 
-main1()
+    table_plot(results, "Wine clustering (standardized data)", "results2.svg")
+
+if __name__ == "__main__":
+    print("Choose experiment: 1 or 2")
+    number = input()
+    while number not in ["1", "2"]:
+        print("Choose a correct number: 1 or 2")
+        number = input()
+
+    if number == "1":
+        main1()
+    elif number == "2":
+        main2()
+
+
 
 
 
