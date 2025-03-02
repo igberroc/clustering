@@ -5,6 +5,7 @@
 import math
 import numpy as np
 import inspect
+import copy
 from typing import Callable
 
 from points import Distance, Cluster, euclidean_distance, Point
@@ -134,7 +135,7 @@ def centroid(matrix: np.ndarray, l:int, i:int, j:int, n_i: int, n_j: int):
 def agglomerative(data: list[Point], method: Callable[..., float], max_dist: float = 0,
                   dist: Distance = euclidean_distance) -> tuple[np.ndarray, list[Cluster]]:
     """
-    Given a set of data, the parameters for lance williams formula, the maximum distance allowed to combine two clusters,
+    Given a set of data, the linkage method, the maximum distance allowed to combine two clusters,
     and the distance to use, returns the linkage matrix and the final clusters, where each list of linkage matrix is:
     [[i,j,d,n],...] with:
           i = cluster index for the first cluster which will be combined.
@@ -145,10 +146,7 @@ def agglomerative(data: list[Point], method: Callable[..., float], max_dist: flo
     Parameters
     ----------
     data: set of data.
-    a: parameter for lance williams.
-    b: parameter for lance williams.
-    c: parameter for lance williams.
-    d: parameter for lance williams.
+    method: linkage method.
     max_dist: maximum distance allowed to combine two clusters.
     dist: distance to use.
 
@@ -162,33 +160,41 @@ def agglomerative(data: list[Point], method: Callable[..., float], max_dist: flo
 
     """
     n_param = len(inspect.signature(method).parameters)
-    result = []
     n = len(data)
-    linkage_matrix = np.zeros((n-1,4))
-    list_clusters = [0 for _ in range(n)]
-    (matrix, minimum, (i,j)) = proximity_matrix(data, dist)
+    linkage_matrix = np.zeros((n-1,4))  #Linkage matrix for the future dendogram.
+    list_clusters = []
+    clusters_indexes = []      #Cluster numbers for the linkage matrix.
+    result = []
     for k in range(n):                             #Initial clusters
         cluster = Cluster({data[k]})
-        list_clusters[k] = (cluster,k)
+        list_clusters.append(cluster)
         result.append(cluster)
+        clusters_indexes.append(k)
+    last_merge_valid = False          #True if the clusters in the last iteration were combined at a distance <= max_dist, and False otherwise.
+    (matrix, minimum, (i,j)) = proximity_matrix(data, dist)  #Initial proximity matrix, with minimum distance between clusters and their indexes.
     for s in range(n-1):
         if s != 0:
             (minimum,(i,j)) = min_distance(matrix)
-        (cluster1,k1) = list_clusters.pop(j)
-        (cluster2,k2) = list_clusters[i]
+        if minimum <= max_dist:
+            last_merge_valid = True
+        elif last_merge_valid:        #If minimum > max_dist and the last merge was at a distance <= max_dist, the result will be the last list of clusters. We do this
+            result = list_clusters.copy()   # to avoid copying list_clusters every time minimum <= max_dist, and only do it when the last merge occurred but doesn't happen now.
+            last_merge_valid = False      #Variable updated.
+        cluster1 = list_clusters.pop(j)   #We can do this because i < j, so the element at position i remains unchanged.
+        k1 = clusters_indexes.pop(j)
+        cluster2 = list_clusters[i]
+        k2 = clusters_indexes[i]
         linkage_matrix[s] = np.array([k1,k2,minimum,cluster1.size() + cluster2.size()])
         new_cluster = cluster1.combine(cluster2)
-        list_clusters[i] = (new_cluster, n + s)
-        if minimum <= max_dist:                      #If two clusters combine at a distance <= max_dist, we add the combination to the final list of clusters
-            result.pop(j)
-            result[i] = new_cluster
+        list_clusters[i] = new_cluster
+        clusters_indexes[i] = n + s         #We update the cluster number.
         for l in range(len(list_clusters)):          #Updating distance matrix
             if l != i and l != j:
                 if l < i:
                     change_pos = (l,i)
                 else:
                     change_pos = (i,l)
-                if n_param == 4:                                      #Different cases for not using n_l, n_i or n_l, if they're not needed.
+                if n_param == 4:                                      #Different cases for not using n_l, n_i or n_j, if they're not needed.
                         matrix[change_pos] = method(matrix,l,i,j)
                 else:
                     n_i = cluster1.size()
@@ -196,10 +202,12 @@ def agglomerative(data: list[Point], method: Callable[..., float], max_dist: flo
                     if n_param == 6:
                         matrix[change_pos] = method(matrix,l,i,j,n_i,n_j)
                     else:
-                        n_l = list_clusters[l][0].size()
+                        n_l = list_clusters[l].size()
                         matrix[change_pos] = method(matrix,l,i,j,n_l,n_i,n_j)
 
         matrix = np.delete(np.delete(matrix, j, axis = 0),j,axis = 1)            #Remove row and column j
+    if last_merge_valid:
+        result = list_clusters    #Copy not needed, because list_clusters won`t be modified.
     return linkage_matrix, result
         
 

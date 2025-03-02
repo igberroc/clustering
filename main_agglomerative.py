@@ -7,8 +7,8 @@ from sklearn.datasets import load_iris
 import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import dendrogram
 
-from agglomerative import agglomerative, single, complete, ward, average
-from points import Point
+from agglomerative import agglomerative, ward, average
+from points import Point, descompose_x_y
 from metrics import silhouette_index, db_index
 
 def main1():
@@ -23,11 +23,27 @@ def main1():
     (linkage_matrix,result) = agglomerative(data, average, 0.6)
     silhouette = silhouette_index(result)
     print(f"The Silhouette index is: {silhouette} ")
-    
-    
+
     db = db_index(result)
     print(f"The Davies-Bouldin index is: {db} ")
-    
+
+    (x1, y1) = descompose_x_y(result[0])
+    (x2, y2) = descompose_x_y(result[1])
+    (x3, y3) = descompose_x_y(result[2])
+    (x4, y4) = descompose_x_y(result[3])
+
+    plt.figure()
+    plt.plot(x1, y1, 'o', markerfacecolor='red')
+    plt.plot(x2, y2, 'o', markerfacecolor='blue')
+    plt.plot(x3, y3, 'o', markerfacecolor='green')
+    plt.plot(x4, y4, 'o', markerfacecolor='yellow')
+
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title("Clusters agglomerative")
+    plt.legend()
+    plt.show()
+
     plt.figure()
     dendrogram(linkage_matrix)
     plt.xlabel("clusters indexes")
