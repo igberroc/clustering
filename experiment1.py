@@ -1,3 +1,5 @@
+import sys
+
 
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
@@ -115,18 +117,13 @@ def main2():
 
 
 if __name__ == "__main__":
-    print("Choose experiment: 1 or 2")
-    number = input()
-    while number not in ["1", "2"]:
-        print("Choose a correct number: 1 or 2")
-        number = input()
-
-    if number == "1":
+    if len(sys.argv) < 2:
+        print(f"Usage: {sys.argv[0]} <experiment_number>")
+        exit(1)
+    number = int(sys.argv[1])
+    if number == 1:
         main1()
-    elif number == "2":
+    elif number == 2:
         main2()
-
-
-
-
-
+    else:
+        print("Invalid experiment number")
