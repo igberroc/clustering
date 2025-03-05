@@ -35,14 +35,15 @@ def em(data: list[Point], n_clusters: int, initial_covariances: list[np.ndarray]
        eps: float, max_iter: int) -> list[Cluster]:
     """
     Given a set of data, the number of clusters, and conditions for the loop´s body,
-    returns the list of the clusters.
+    returns the list of the clusters using the Expectation-Maximization algorithm.
     
     Parameters
     ----------
-    data: list of points
-    n_clusters: number of clusters. 
+    data: list of points.
+    n_clusters: number of clusters.
+    initial_covariances: list of initial covariance matrices.
     eps: minimum difference between new log_likelihood and old likelihood for finishing the loop.
-    max_iter: maximum number of iterations
+    max_iter: maximum number of iterations.
 
     Returns
     -------

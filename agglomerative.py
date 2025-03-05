@@ -161,7 +161,7 @@ def agglomerative(data: list[Point], method: Callable[..., float], max_dist: flo
     """
     n_param = len(inspect.signature(method).parameters)
     n = len(data)
-    linkage_matrix = np.zeros((n-1,4))  #Linkage matrix for the future dendogram.
+    linkage_matrix = np.zeros((n-1,4))  #Linkage matrix for the future dendrogram.
     list_clusters = []
     clusters_indexes = []      #Cluster numbers for the linkage matrix.
     result = []

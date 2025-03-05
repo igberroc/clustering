@@ -31,7 +31,7 @@ def centroids_condition(centroids: list[Point], new_centroids: list[Point],
     return False
 
 
-def fuzzy_cmeans(data: list[Point], initial_centroids: list[Point], m: int, c: int, eps: float, max_iter: int,
+def fuzzy_cmeans(data: list[Point], initial_centroids: list[Point], m: float, c: int, eps: float, max_iter: int,
                  dist: Distance = euclidean_distance) -> np.ndarray:
     """
     Given a set of data, a list of initial centroids, the fuzzification parameter,
