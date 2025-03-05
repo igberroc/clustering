@@ -13,14 +13,23 @@ from dbscan import dbscan
 from EM import em
 
 
-def kmeans_test(data, k, eps, max_iter, dist = euclidean_distance):
+def kmeans_test(data: list[Points],
+                k, eps, max_iter, dist = euclidean_distance) -> tuple[str, float, float, float, float]:
+    """
+        Test the KMeans algorithm with the given parameters
+        :param data: list of Points
+        :param k: number of clusters
+        :param eps: tolerance
+        :param max_iter: maximum number of iterations
+        :param dist: distance function
+    """
     t0 = perf_counter()
     list_clusters = kmeans(data, k, eps, max_iter, dist)
     t1 = perf_counter()
     silhouette = silhouette_index(list_clusters)
     db = db_index(list_clusters)
     c = c_index(data, list_clusters)
-    return [f'KMeans(eps = {eps}, max_iter = {max_iter})', silhouette, db, c, t1 - t0]
+    return f'KMeans(eps = {eps}, max_iter = {max_iter})', silhouette, db, c, t1 - t0
 
 def agglomerative_test(data, method, max_dist = 0, dist = euclidean_distance):
     t0 = perf_counter()
@@ -79,5 +88,3 @@ def table_plot(results: list[list], plot_title: str, filename: str):
     table.set_fontsize(10)
     table.auto_set_column_width([0, 1, 2, 3, 4])
     plt.savefig(filename, format = "svg")
-
-
