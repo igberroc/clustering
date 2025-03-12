@@ -72,15 +72,29 @@ class Cluster:
             self.points = set()
         else:
             self.points = points
+
+    def set_points(self) -> set[Point]:
+        return self.points
         
     def add_point(self,point: Point):
         self.points.add(point)
         
     def quit_point(self,point: Point):
         self.points.remove(point)
-        
+
+    def points_dimension(self) -> int:
+        point = next(iter(self.points))
+        return point.dimension()
+
+    def points_sum(self) -> Point:
+        dimension = self.points_dimension()
+        s = Point.null_point(dimension)
+        for point in self.points:
+            s = s.sum(point)
+        return s
+
     def centroid(self) -> Point:
-        dimension = list(self.points)[0].dimension()
+        dimension = self.points_dimension()
         s = Point.null_point(dimension)
         for point in self.points:
             s = s.sum(point)
@@ -105,7 +119,7 @@ class Cluster:
         return cluster
         
 
-def descompose_x_y(cluster: Cluster) -> tuple[list[float],list[float]]:
+def decompose_x_y(cluster: Cluster) -> tuple[list[float],list[float]]:
     x = []
     y = []
     for point in cluster.points:

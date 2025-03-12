@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import dendrogram
 
 from agglomerative import agglomerative, ward, average
-from points import Point, descompose_x_y
+from points import Point, decompose_x_y
 from metrics import silhouette_index, db_index
 
 def main1():
@@ -27,10 +27,10 @@ def main1():
     db = db_index(result)
     print(f"The Davies-Bouldin index is: {db} ")
 
-    (x1, y1) = descompose_x_y(result[0])
-    (x2, y2) = descompose_x_y(result[1])
-    (x3, y3) = descompose_x_y(result[2])
-    (x4, y4) = descompose_x_y(result[3])
+    (x1, y1) = decompose_x_y(result[0])
+    (x2, y2) = decompose_x_y(result[1])
+    (x3, y3) = decompose_x_y(result[2])
+    (x4, y4) = decompose_x_y(result[3])
 
     plt.figure()
     plt.plot(x1, y1, 'o', markerfacecolor='red')

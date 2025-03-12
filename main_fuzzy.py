@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from points import Point
 from fuzzy import fuzzy_cmeans
 
-def descompose_x_y(lista: list[Point]) -> tuple[list[float],list[float]]:
+def decompose_x_y(lista: list[Point]) -> tuple[list[float],list[float]]:
     x = []
     y = []
     for point in lista:
@@ -24,7 +24,7 @@ def main1():
     data3 = [Point(0 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(npoints)]
     data4 = [Point(0 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
     data = data1 + data2 + data3 + data4
-    (x,y) = descompose_x_y(data)
+    (x,y) = decompose_x_y(data)
 
     initial_centroids = [Point(random.uniform(-5, 5), random.uniform(-5, 5)) for _ in range(4)]
     membership_matrix = fuzzy_cmeans(data, initial_centroids,2,4,0.001, 100)
@@ -44,7 +44,7 @@ def main_penguins():
     dataset = penguins[['bill_length_mm', 'bill_depth_mm']].values.tolist()
     for i in range(len(dataset)):
         dataset[i] = Point(dataset[i][0],dataset[i][1])
-    (x, y) = descompose_x_y(dataset)
+    (x, y) = decompose_x_y(dataset)
 
     initial_centroids = [Point(random.uniform(-5,5),random.uniform(-5,5)) for _ in range(3)]
     membership_matrix = fuzzy_cmeans(dataset, initial_centroids,2,3,0.001, 100)

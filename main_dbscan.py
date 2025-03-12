@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.datasets import make_moons
 import numpy as np
 
-from points import Point, Cluster, descompose_x_y
+from points import Point, Cluster, decompose_x_y
 from dbscan import dbscan
 from metrics import silhouette_index, db_index, c_index
 
@@ -30,7 +30,7 @@ def main1():
     
     used_colors = set()
     for cluster in list_clusters:
-        (x,y) = descompose_x_y(cluster)
+        (x,y) = decompose_x_y(cluster)
         color = random_color()
         while color in used_colors:
             color = random_color()
@@ -46,7 +46,7 @@ def main1():
     c = c_index(data, list_clusters)
     print(f"The C-index is: {c} ")
 
-    (x,y) = descompose_x_y(noise)
+    (x,y) = decompose_x_y(noise)
     plt.scatter(x,y, s = 10, color = 'black')
 
     plt.xlabel("X")
@@ -66,7 +66,7 @@ def main2():
     
     used_colors = set()
     for cluster in list_clusters:
-        (x,y) = descompose_x_y(cluster)
+        (x,y) = decompose_x_y(cluster)
         color = random_color()
         while color in used_colors:
             color = random_color()
@@ -82,7 +82,7 @@ def main2():
     c = c_index(data, list_clusters)
     print(f"The C-index is: {c} ")
 
-    (x,y) = descompose_x_y(noise)
+    (x,y) = decompose_x_y(noise)
     plt.plot(x,y, 'o', color = 'black')
 
     plt.xlabel("X")
@@ -114,7 +114,7 @@ def main3():
     
     used_colors = set()
     for cluster in list_clusters:
-        (x,y) = descompose_x_y(cluster)
+        (x,y) = decompose_x_y(cluster)
         color = random_color()
         while color in used_colors:
             color = random_color()
@@ -130,7 +130,7 @@ def main3():
     c = c_index(data, list_clusters)
     print(f"The C-index is: {c} ")
 
-    (x,y) = descompose_x_y(noise)
+    (x,y) = decompose_x_y(noise)
     plt.plot(x,y, 'o', color = 'black')
 
     plt.xlabel("X")

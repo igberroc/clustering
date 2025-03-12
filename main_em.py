@@ -5,7 +5,7 @@ import numpy as np
 
 from EM import em
 from metrics import silhouette_index, db_index
-from points import Point, descompose_x_y
+from points import Point, decompose_x_y
 
 def main1():
     n_clusters = 3
@@ -29,9 +29,9 @@ def main1():
     db = db_index(list_clusters)
     print(f"The Davies-Bouldin index is: {db} ")
 
-    (x1,y1) = descompose_x_y(list_clusters[0])
-    (x2,y2) = descompose_x_y(list_clusters[1])
-    (x3,y3) = descompose_x_y(list_clusters[2]) 
+    (x1,y1) = decompose_x_y(list_clusters[0])
+    (x2,y2) = decompose_x_y(list_clusters[1])
+    (x3,y3) = decompose_x_y(list_clusters[2]) 
     plt.plot(x1,y1,'o',markerfacecolor = 'red') 
     plt.plot(x2,y2,'o',markerfacecolor = 'blue') 
     plt.plot(x3,y3,'o',markerfacecolor = 'green')

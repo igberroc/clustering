@@ -8,7 +8,7 @@ import numpy as np
 def min_dist_point_cluster(point: Point, list_clusters: list[Cluster],
                            dist: Distance = euclidean_distance) -> float:
     """
-    Given a point and a list of clusters, returns the minimum distance between the point and a clusters,
+    Given a point and a list of clusters, returns the minimum distance between the point and a cluster,
     where the distance between a point and a cluster is the average distance between the point and all the points.
 
     Parameters
@@ -24,7 +24,7 @@ def min_dist_point_cluster(point: Point, list_clusters: list[Cluster],
     minimum = math.inf
     b = 0
     for cluster in list_clusters:
-        for point_in in cluster.points:
+        for point_in in cluster.set_points():
             b += dist(point,point_in)
         b = b / cluster.size()
         minimum = min(b,minimum)
@@ -76,7 +76,7 @@ def silhouette_index_point(point: Point, own_cluster: Cluster,
     index = (b - a) / max(a,b)
     return index
 
-# -1 indica mala clasficacion, 1 indica buena clasificacion
+
 def silhouette_index(list_clusters: list[Cluster], dist: Distance = euclidean_distance) -> float:
     """
     Given a list of clusters, returns the silhouette index.
@@ -94,7 +94,7 @@ def silhouette_index(list_clusters: list[Cluster], dist: Distance = euclidean_di
     index = 0
     for _ in range(len(list_clusters)):
         cluster = list_clusters.pop(0)
-        for point in cluster.points:
+        for point in cluster.set_points():
             index += silhouette_index_point(point, cluster, list_clusters, dist)
         num_points += cluster.size()
         list_clusters.append(cluster)
@@ -115,7 +115,7 @@ def cluster_dispersion(cluster: Cluster, dist: Distance = euclidean_distance) ->
     """
     centroid = cluster.centroid()
     dispersion = 0
-    for point in cluster.points:
+    for point in cluster.set_points():
         dispersion += dist(point,centroid)
     return dispersion / cluster.size(),centroid
 
@@ -169,7 +169,7 @@ def s_w(list_clusters: list[Cluster], dist: Distance = euclidean_distance) -> tu
     m = 0
     for cluster in list_clusters:
         m += cluster.size()*(cluster.size()-1)//2
-        set_points = cluster.points.copy()
+        set_points = cluster.set_points().copy()
         while len(set_points) != 1:
             point = set_points.pop()
             for point_in in set_points:
@@ -229,6 +229,134 @@ def c_index(data: list[Point], list_clusters: list[Cluster], dist: Distance = eu
     return (s - s_min) / (s_max - s_min)
 
 
+def cluster_and_global_centroids(list_clusters: list[Cluster]) -> tuple[Point, list[Point], int]:
+    """
+    Given a list of clusters, returns the global centroid of all the points, a list of the centroids
+    of each cluster, and the number of points. It is an efficient way to calculate both the global centroid
+    and the centroids of each cluster at the same time.
+
+    Parameters
+    ----------
+    list_clusters: list of clusters.
+
+    Returns
+    -------
+    The global centroid, a list of the centroids of each cluster, and the number of points.
+    """
+    dimension = list_clusters[0].points_dimension()
+    global_centroid = Point.null_point(dimension)
+    list_centroids = []
+    n = 0
+    for cluster in list_clusters:
+        points_sum = cluster.points_sum()
+        size = cluster.size()
+        n += size
+        list_centroids.append(points_sum.div_num(size))
+        global_centroid = global_centroid.sum(points_sum)
+    global_centroid = global_centroid.div_num(n)
+    return global_centroid, list_centroids, n
+
+
+def ch_index(list_clusters: list[Cluster], dist: Distance = euclidean_distance) -> float:
+    """
+    Given a list of clusters, returns the Calinski-Harabasz index.
+
+    Parameters
+    ----------
+    list_clusters: list of clusters.
+    dist: distance to use (euclidean distance recommended).
+
+    Returns
+    -------
+    ch index: positive number, the higher the better.
+    """
+    ssb = 0
+    ssw = 0
+    global_centroid, list_centroids, n = cluster_and_global_centroids(list_clusters)
+    k = len(list_clusters)
+    for i in range(k):
+        cluster = list_clusters[i]
+        centroid = list_centroids[i]
+        ssb += cluster.size()*(dist(centroid,global_centroid)**2)
+        for point in cluster.set_points():
+            ssw += dist(point, centroid)**2
+    return (ssb / (k - 1)) / (ssw / (n - k))
+
+
+def cluster_distance(cluster1: Cluster, cluster2: Cluster, dist: Distance = euclidean_distance) -> float:
+    """
+    Given two clusters, returns the distance between them (the smallest distance among the distances
+    between points in the two clusters).
+
+    Parameters
+    ----------
+    cluster1: one cluster.
+    cluster2: other cluster.
+    dist: distance to use.
+
+    Returns
+    -------
+    The distance between the two clusters.
+    """
+    minimum = math.inf
+    for point1 in cluster1.set_points():
+        for point2 in cluster2.set_points():
+            distance = dist(point1, point2)
+            if distance < minimum:
+                minimum = distance
+    return minimum
+
+def diameter(cluster: Cluster, dist: Distance = euclidean_distance) -> float:
+    """
+    Given a cluster, returns the diameter of the cluster (biggest distance between two points in the cluster).
+
+    Parameters
+    ----------
+    cluster: the cluster.
+
+    Returns
+    -------
+    The diameter of the cluster.
+    """
+    cluster_list = list(cluster.set_points())
+    n = len(cluster_list)
+    maximum = 0
+    for i in range(n):
+        point1 = cluster_list[i]
+        for j in range(i + 1, n):
+            point2 = cluster_list[j]
+            distance = dist(point1, point2)
+            if distance > maximum:
+                maximum = distance
+    return maximum
+
+def dunn_index(list_clusters: list[Cluster], dist: Distance = euclidean_distance) -> float:
+    """
+    Given a list of clusters, returns the Dunn index.
+
+    Parameters
+    ----------
+    list_clusters: list of clusters.
+    dist: distance to use.
+
+    Returns
+    -------
+    dunn index: positive number, the higher the better.
+    """
+    k = len(list_clusters)
+    max_diameter = 0
+    min_distance  = math.inf
+    for i in range(k):
+        cluster1 = list_clusters[i]
+        diam = diameter(cluster1)
+        if diam > max_diameter:
+            max_diameter = diam
+        for j in range(i + 1, k):
+            cluster2 = list_clusters[j]
+            distance = cluster_distance(cluster1, cluster2, dist)
+            if distance < min_distance:
+                min_distance = distance
+    return min_distance / max_diameter
 
 
 
@@ -236,7 +364,10 @@ def c_index(data: list[Point], list_clusters: list[Cluster], dist: Distance = eu
 
 
 
-        
+
+
+
+
         
         
     

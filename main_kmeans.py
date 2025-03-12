@@ -7,8 +7,8 @@ import random
 from sklearn.datasets import make_moons
 
 from kmeans import kmeans
-from points import Point, descompose_x_y
-from metrics import silhouette_index, db_index, c_index
+from points import Point, decompose_x_y
+from metrics import silhouette_index, db_index, c_index, ch_index, dunn_index
 
 
 def main1():
@@ -30,10 +30,16 @@ def main1():
     c = c_index(data, list_clusters)
     print(f"The C-index is: {c} ")
 
-    (x1,y1) = descompose_x_y(list_clusters[0])
-    (x2,y2) = descompose_x_y(list_clusters[1])
-    (x3,y3) = descompose_x_y(list_clusters[2])
-    (x4,y4) = descompose_x_y(list_clusters[3])  
+    ch = ch_index(list_clusters)
+    print(f"The Calinski-Harabasz index is: {ch} ")
+
+    dunn = dunn_index(list_clusters)
+    print(f"The Dunn index is: {dunn} ")
+
+    (x1,y1) = decompose_x_y(list_clusters[0])
+    (x2,y2) = decompose_x_y(list_clusters[1])
+    (x3,y3) = decompose_x_y(list_clusters[2])
+    (x4,y4) = decompose_x_y(list_clusters[3])  
     
     plt.plot(x1,y1,'o',markerfacecolor = 'red') 
     plt.plot(x2,y2,'o',markerfacecolor = 'blue') 
@@ -64,8 +70,14 @@ def main2():
     c = c_index(data, list_clusters)
     print(f"The C-index is: {c} ")
 
-    (x1,y1) = descompose_x_y(list_clusters[0])
-    (x2,y2) = descompose_x_y(list_clusters[1])
+    ch = ch_index(list_clusters)
+    print(f"The Calinski-Harabasz index is: {ch} ")
+
+    dunn = dunn_index(list_clusters)
+    print(f"The Dunn index is: {dunn} ")
+
+    (x1,y1) = decompose_x_y(list_clusters[0])
+    (x2,y2) = decompose_x_y(list_clusters[1])
     
     plt.plot(x1,y1,'o',markerfacecolor = 'red') 
     plt.plot(x2,y2,'o',markerfacecolor = 'blue') 
@@ -76,8 +88,7 @@ def main2():
     plt.legend()
     plt.show()
     
-    
-    
+
     
     
     
