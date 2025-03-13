@@ -7,7 +7,7 @@ from typing import Callable
 
 from points import Cluster, euclidean_distance, Point, Distance
 from kmeans import kmeans
-from metrics import silhouette_index, db_index, c_index
+from metrics import silhouette_index, db_index, c_index, ch_index, dunn_index
 from agglomerative import agglomerative
 from fuzzy import fuzzy_cmeans
 from dbscan import dbscan
@@ -15,7 +15,7 @@ from EM import em
 
 
 def kmeans_exp(data: list[Point], k: int, eps: float, max_iter: int
-                , dist: Distance = euclidean_distance) -> tuple[str, float, float, float, float]:
+                , dist: Distance = euclidean_distance) -> tuple[str, float, float, float, float, float, float]:
     """
     Test the K-means algorithm with the given parameters.
 
@@ -38,10 +38,13 @@ def kmeans_exp(data: list[Point], k: int, eps: float, max_iter: int
     silhouette = silhouette_index(list_clusters)
     db = db_index(list_clusters)
     c = c_index(data, list_clusters)
-    return f'KMeans(eps = {eps}, max_iter = {max_iter})', silhouette, db, c, t1 - t0
+    ch = ch_index(list_clusters)
+    dunn = dunn_index(list_clusters)
+    return f'KMeans(eps = {eps}, max_iter = {max_iter})', silhouette, db, c, ch, dunn, t1 - t0
 
 def agglomerative_exp(data: list[Point], method: Callable[..., float], max_dist: int = 0,
-                       dist: Distance = euclidean_distance) -> tuple[tuple[str, float, float, float, float], np.ndarray]:
+                       dist: Distance = euclidean_distance)\
+        -> tuple[tuple[str, float, float, float, float, float, float], np.ndarray]:
     """
     Test the agglomerative algorithm with the given parameters.
 
@@ -63,10 +66,13 @@ def agglomerative_exp(data: list[Point], method: Callable[..., float], max_dist:
     silhouette = silhouette_index(list_clusters)
     db = db_index(list_clusters)
     c = c_index(data, list_clusters)
-    return (f'Agglomerative({method.__name__} linkage, max_dist = {max_dist}) ', silhouette, db, c, t1 - t0), linkage_matrix
+    ch = ch_index(list_clusters)
+    dunn = dunn_index(list_clusters)
+    return (f'Agglomerative({method.__name__} linkage, max_dist = {max_dist}) ', silhouette, db, c, ch, dunn, t1 - t0), linkage_matrix
 
 def fuzzy_exp(data: list[Point], initial_centroids: list[Point], m: float, c: int,
-               eps: float, max_iter: int, dist: Distance = euclidean_distance) -> tuple[str, float, float, float, float]:
+               eps: float, max_iter: int, dist: Distance = euclidean_distance)\
+        -> tuple[str, float, float, float, float, float, float]:
     """
     Test the fuzzy algorithm with the given parameters.
 
@@ -95,10 +101,12 @@ def fuzzy_exp(data: list[Point], initial_centroids: list[Point], m: float, c: in
     silhouette = silhouette_index(list_clusters)
     db = db_index(list_clusters)
     c = c_index(data, list_clusters)
-    return f'Fuzzy(m = {m}, eps = {eps}, max_iter = {max_iter})', silhouette, db, c, t1 - t0
+    ch = ch_index(list_clusters)
+    dunn = dunn_index(list_clusters)
+    return f'Fuzzy(m = {m}, eps = {eps}, max_iter = {max_iter})', silhouette, db, c, ch, dunn, t1 - t0
 
 def dbscan_exp(data: list[Point], eps: float, min_points: int,
-                dist: Distance = euclidean_distance) -> tuple[str, float, float, float, float]:
+                dist: Distance = euclidean_distance) -> tuple[str, float, float, float, float, float, float]:
     """
     Test the DBSCAN algorithm with the given parameters.
 
@@ -120,10 +128,12 @@ def dbscan_exp(data: list[Point], eps: float, min_points: int,
     silhouette = silhouette_index(list_clusters)
     db = db_index(list_clusters)
     c = c_index(data, list_clusters)
-    return f'DBSCAN(eps = {eps}, min_points = {min_points})', silhouette, db, c, t1 - t0
+    ch = ch_index(list_clusters)
+    dunn = dunn_index(list_clusters)
+    return f'DBSCAN(eps = {eps}, min_points = {min_points})', silhouette, db, c, ch, dunn, t1 - t0
 
 def em_exp(data: list[Point], n_clusters: int, initial_covariances: list[np.ndarray],
-            eps: float, max_iter: int) -> tuple[str, float, float, float, float]:
+            eps: float, max_iter: int) -> tuple[str, float, float, float, float, float, float]:
     """
     Test the EM algorithm with the given parameters.
 
@@ -146,7 +156,9 @@ def em_exp(data: list[Point], n_clusters: int, initial_covariances: list[np.ndar
     silhouette = silhouette_index(list_clusters)
     db = db_index(list_clusters)
     c = c_index(data, list_clusters)
-    return f'EM(eps = {eps}, max_iter = {max_iter})', silhouette, db, c, t1 - t0
+    ch = ch_index(list_clusters)
+    dunn = dunn_index(list_clusters)
+    return f'EM(eps = {eps}, max_iter = {max_iter})', silhouette, db, c, ch, dunn, t1 - t0
 
 def table_plot(results: list[list], plot_title: str, filename: str):
     """
@@ -160,8 +172,8 @@ def table_plot(results: list[list], plot_title: str, filename: str):
 
     """
     df_results = pd.DataFrame(results,
-                              columns=["Algorithm", "Silhouette index", "Davies-Bouldin index", "C-index", "Time(s)"])
-    plt.figure(figsize=(10, 4))
+                              columns=["Algorithm", "Silhouette", "Davies-Bouldin", "C-index", "Calinski-Harabasz", "Dunn", "Time(s)"])
+    plt.figure(figsize=(12, 4))
     plt.title(plot_title, fontsize = 14, fontweight='bold')
     ax = plt.gca()
     ax.xaxis.set_visible(False)

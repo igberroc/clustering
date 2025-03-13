@@ -11,6 +11,19 @@ from points import Point
 from agglomerative import median, complete, average, ward
 from experiment_functions import kmeans_exp, agglomerative_exp, fuzzy_exp, dbscan_exp, em_exp, table_plot
 
+def subplot_dendrogram(linkage_matrix1: np.ndarray, linkage_matrix2: np.ndarray, method1: str,
+                       method2: str, filename: str):
+    fig, axes = plt.subplots(1, 2, figsize = (20, 4))
+    dendrogram(linkage_matrix1, ax = axes[0], leaf_rotation = 90, leaf_font_size = 3)
+    axes[0].set_title(method1)
+    axes[0].set_xlabel("cluster indexes")
+    axes[0].set_ylabel("distance between clusters")
+    dendrogram(linkage_matrix2, ax = axes[1], leaf_rotation = 90, leaf_font_size = 3)
+    axes[1].set_title(method2)
+    axes[1].set_xlabel("cluster indexes")
+    axes[1].set_ylabel("distance between clusters")
+    plt.savefig(filename, format = "svg")
+
 
 def main_raw():
     """
@@ -53,17 +66,8 @@ def main_raw():
     results.append(em_results)
 
     #Plots
-    fig, axes = plt.subplots(1, 2, figsize = (20, 4))
-    dendrogram(linkage_matrix1, ax = axes[0], leaf_rotation = 90, leaf_font_size = 3)
-    axes[0].set_title("Complete linkage")
-    axes[0].set_xlabel("cluster indexes")
-    axes[0].set_ylabel("distance between clusters")
-    dendrogram(linkage_matrix2, ax=axes[1], leaf_rotation = 90, leaf_font_size = 3)
-    axes[1].set_title("Median linkage")
-    axes[1].set_xlabel("cluster indexes")
-    axes[1].set_ylabel("distance between clusters")
-    plt.savefig("dendrograms_wines_raw.svg", format = "svg")
-
+    subplot_dendrogram(linkage_matrix1, linkage_matrix2, "Complete linkage",
+                      "Median linkage", "dendrograms_wines_raw.svg")
     table_plot(results, "Wine clustering", "results_wines_raw.svg")
 
 
@@ -110,17 +114,8 @@ def main_standarized():
     results.append(em_results)
 
     #Plots
-    fig, axes = plt.subplots(1, 2, figsize = (20, 4))
-    dendrogram(linkage_matrix1, ax = axes[0], leaf_rotation = 90, leaf_font_size = 3)
-    axes[0].set_title("Average linkage")
-    axes[0].set_xlabel("cluster indexes")
-    axes[0].set_ylabel("distance between clusters")
-    dendrogram(linkage_matrix2, ax=axes[1], leaf_rotation = 90, leaf_font_size = 3)
-    axes[1].set_title("Ward linkage")
-    axes[1].set_xlabel("cluster indexes")
-    axes[1].set_ylabel("distance between clusters")
-    plt.savefig("dendrograms_wines_stand.svg", format = "svg")
-
+    subplot_dendrogram(linkage_matrix1, linkage_matrix2, "Average linkage",
+                       "Ward linkage", "dendrograms_wines_stand.svg")
 
     table_plot(results, "Wine clustering (standardized data)", "results_wines_stand.svg")
 
