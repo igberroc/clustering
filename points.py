@@ -66,6 +66,35 @@ def str_distance(s1: str, s2: str) -> float:
     return sum(1 for x,y in zip(s1,s2) if x != y)
 
 
+def gower_distance(Point1: Point, Point2: Point, bin_or_cat: list[bool],
+                   min_max: dict[int, tuple[int, int] | tuple[float, float]] ) -> float:
+    """
+    Given two points, a list which indicates if each variable is binary or categorical, or not, and
+    a dictionary with minimum and maximum values for continuos variables.
+
+    Parameters
+    ----------
+    Point1: first point.
+    Point2: second point.
+    bin_or_cat: list of bool which indicates if each variable is binary or categorical (True), or not (False).
+    min_max: dictionary with minimum and maximum values for continuous variables.
+
+    Returns
+    -------
+    Gower distance.
+    """
+    cord1 = Point1.get_coordinates()
+    cord2 = Point2.get_coordinates()
+    dim = Point1.dimension()
+    d = 0
+    for i in range(dim):
+        if bin_or_cat[i]:
+            if cord1[i] != cord2[i]:
+                d += 1
+        else:
+            d += abs(cord1[i] - cord2[i])/(min_max[i][1] - min_max[i][0])
+    return d / dim
+
 class Cluster:
     def __init__(self, points: set[Point] = None):
         if points == None:
@@ -105,17 +134,12 @@ class Cluster:
     def clear(self) -> None:
         self.points = set()
 
-    def copy_cluster(self) -> Self:
-        cluster = Cluster()
-        cluster.points = self.points.copy()
-        return cluster
-    
     def size(self) -> int:
         return len(self.points)
     
     def combine(self,other) -> Self:
-        cluster = self.copy_cluster()
-        cluster.points = cluster.points | other.points
+        cluster = Cluster()
+        cluster.points = self.points | other.points
         return cluster
         
 

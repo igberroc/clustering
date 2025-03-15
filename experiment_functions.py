@@ -35,11 +35,11 @@ def kmeans_exp(data: list[Point], k: int, eps: float, max_iter: int
     t0 = perf_counter()
     list_clusters = kmeans(data, k, eps, max_iter, dist)
     t1 = perf_counter()
-    silhouette = silhouette_index(list_clusters)
-    db = db_index(list_clusters)
-    c = c_index(data, list_clusters)
-    ch = ch_index(list_clusters)
-    dunn = dunn_index(list_clusters)
+    silhouette = silhouette_index(list_clusters, dist)
+    db = db_index(list_clusters, dist)
+    c = c_index(data, list_clusters, dist)
+    ch = ch_index(list_clusters, dist)
+    dunn = dunn_index(list_clusters, dist)
     return f'KMeans(eps = {eps}, max_iter = {max_iter})', silhouette, db, c, ch, dunn, t1 - t0
 
 def agglomerative_exp(data: list[Point], method: Callable[..., float], max_dist: int = 0,
@@ -63,11 +63,11 @@ def agglomerative_exp(data: list[Point], method: Callable[..., float], max_dist:
     t0 = perf_counter()
     (linkage_matrix, list_clusters) = agglomerative(data, method, max_dist, dist)
     t1 = perf_counter()
-    silhouette = silhouette_index(list_clusters)
-    db = db_index(list_clusters)
-    c = c_index(data, list_clusters)
-    ch = ch_index(list_clusters)
-    dunn = dunn_index(list_clusters)
+    silhouette = silhouette_index(list_clusters, dist)
+    db = db_index(list_clusters, dist)
+    c = c_index(data, list_clusters, dist)
+    ch = ch_index(list_clusters, dist)
+    dunn = dunn_index(list_clusters, dist)
     return (f'Agglomerative({method.__name__} linkage, max_dist = {max_dist}) ', silhouette, db, c, ch, dunn, t1 - t0), linkage_matrix
 
 def fuzzy_exp(data: list[Point], initial_centroids: list[Point], m: float, c: int,
@@ -98,11 +98,11 @@ def fuzzy_exp(data: list[Point], initial_centroids: list[Point], m: float, c: in
     for i in range(len(data)):
         max_index = np.argmax(membership_matrix[:,i])
         list_clusters[max_index].add_point(data[i])
-    silhouette = silhouette_index(list_clusters)
-    db = db_index(list_clusters)
-    c = c_index(data, list_clusters)
-    ch = ch_index(list_clusters)
-    dunn = dunn_index(list_clusters)
+    silhouette = silhouette_index(list_clusters, dist)
+    db = db_index(list_clusters, dist)
+    c = c_index(data, list_clusters, dist)
+    ch = ch_index(list_clusters, dist)
+    dunn = dunn_index(list_clusters, dist)
     return f'Fuzzy(m = {m}, eps = {eps}, max_iter = {max_iter})', silhouette, db, c, ch, dunn, t1 - t0
 
 def dbscan_exp(data: list[Point], eps: float, min_points: int,
@@ -125,15 +125,15 @@ def dbscan_exp(data: list[Point], eps: float, min_points: int,
     t0 = perf_counter()
     (list_clusters, noise) = dbscan(data, eps, min_points, dist)
     t1 = perf_counter()
-    silhouette = silhouette_index(list_clusters)
-    db = db_index(list_clusters)
-    c = c_index(data, list_clusters)
-    ch = ch_index(list_clusters)
-    dunn = dunn_index(list_clusters)
+    silhouette = silhouette_index(list_clusters, dist)
+    db = db_index(list_clusters, dist)
+    c = c_index(data, list_clusters, dist)
+    ch = ch_index(list_clusters, dist)
+    dunn = dunn_index(list_clusters, dist)
     return f'DBSCAN(eps = {eps}, min_points = {min_points})', silhouette, db, c, ch, dunn, t1 - t0
 
 def em_exp(data: list[Point], n_clusters: int, initial_covariances: list[np.ndarray],
-            eps: float, max_iter: int) -> tuple[str, float, float, float, float, float, float]:
+            eps: float, max_iter: int, dist: Distance = euclidean_distance) -> tuple[str, float, float, float, float, float, float]:
     """
     Test the EM algorithm with the given parameters.
 
@@ -144,6 +144,7 @@ def em_exp(data: list[Point], n_clusters: int, initial_covariances: list[np.ndar
     initial_covariances: list of initial covariances matrices.
     eps: tolerance.
     max_iter: maximum number of iterations.
+    dist: distance function (for metrics).
 
     Returns
     -------
@@ -153,11 +154,11 @@ def em_exp(data: list[Point], n_clusters: int, initial_covariances: list[np.ndar
     t0 = perf_counter()
     list_clusters = em(data,n_clusters, initial_covariances, eps ,max_iter)
     t1 = perf_counter()
-    silhouette = silhouette_index(list_clusters)
-    db = db_index(list_clusters)
-    c = c_index(data, list_clusters)
-    ch = ch_index(list_clusters)
-    dunn = dunn_index(list_clusters)
+    silhouette = silhouette_index(list_clusters, dist)
+    db = db_index(list_clusters, dist)
+    c = c_index(data, list_clusters, dist)
+    ch = ch_index(list_clusters, dist)
+    dunn = dunn_index(list_clusters, dist)
     return f'EM(eps = {eps}, max_iter = {max_iter})', silhouette, db, c, ch, dunn, t1 - t0
 
 def table_plot(results: list[list], plot_title: str, filename: str):

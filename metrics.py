@@ -348,7 +348,7 @@ def dunn_index(list_clusters: list[Cluster], dist: Distance = euclidean_distance
     min_distance  = math.inf
     for i in range(k):
         cluster1 = list_clusters[i]
-        diam = diameter(cluster1)
+        diam = diameter(cluster1, dist)
         if diam > max_diameter:
             max_diameter = diam
         for j in range(i + 1, k):

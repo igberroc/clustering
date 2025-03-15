@@ -19,8 +19,8 @@ def main1():
     data3 = [Point(0 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(npoints)]
     data4 = [Point(0 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(npoints)]
     data = data1 + data2 + data3 + data4
-    
     (linkage_matrix,result) = agglomerative(data, average, 0.6)
+
     silhouette = silhouette_index(result)
     print(f"The Silhouette index is: {silhouette} ")
 

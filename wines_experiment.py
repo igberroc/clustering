@@ -41,7 +41,7 @@ def main_raw():
     kmeans_results = kmeans_exp(data, 3, 0.001, 100)
     results.append(kmeans_results)
 
-    agglomerative_results1, linkage_matrix1 = agglomerative_exp(data, complete, 550)
+    agglomerative_results1, linkage_matrix1 = agglomerative_exp(data, complete, 700)
     results.append(agglomerative_results1)
 
     agglomerative_results2, linkage_matrix2 = agglomerative_exp(data, median, 300)
@@ -94,7 +94,7 @@ def main_standarized():
     agglomerative_results1, linkage_matrix1 = agglomerative_exp(data, average, 6.5)
     results.append(agglomerative_results1)
 
-    agglomerative_results2, linkage_matrix2 = agglomerative_exp(data, ward, 20)
+    agglomerative_results2, linkage_matrix2 = agglomerative_exp(data, ward, 40)
     results.append(agglomerative_results2)
 
     initial_centroids = []
