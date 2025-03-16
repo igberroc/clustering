@@ -29,8 +29,8 @@ def kmeans_exp(data: list[Point], k: int, eps: float, max_iter: int
 
     Returns
     -------
-    A string with the name of the algorithm and its parameters, the Silhouette index, the
-    Davies-Bouldin index, the C-index and the execution time of the algorithm.
+    A string with the name of the algorithm and its parameters, the Silhouette index, Davies-Bouldin index,
+    C-index, Calinksi-Harabasz index, Dunn index and the execution time of the algorithm.
     """
     t0 = perf_counter()
     list_clusters = kmeans(data, k, eps, max_iter, dist)
@@ -57,8 +57,8 @@ def agglomerative_exp(data: list[Point], method: Callable[..., float], max_dist:
 
     Returns
     -------
-    A string with the name of the algorithm and its parameters, the Silhouette index, the
-    Davies-Bouldin index, the C-index and the execution time of the algorithm; and the linkage matrix.
+    A string with the name of the algorithm and its parameters, the Silhouette index, Davies-Bouldin index,
+    C-index, Calinksi-Harabasz index, Dunn index and the execution time of the algorithm; and the linkage matrix.
     """
     t0 = perf_counter()
     (linkage_matrix, list_clusters) = agglomerative(data, method, max_dist, dist)
@@ -88,8 +88,8 @@ def fuzzy_exp(data: list[Point], initial_centroids: list[Point], m: float, c: in
 
     Returns
     -------
-    A tuple of a string with the name of the algorithm and its parameters, the Silhouette index, the
-    Davies-Bouldin index, the C-index and the execution time of the algorithm.
+    A string with the name of the algorithm and its parameters, the Silhouette index, Davies-Bouldin index,
+    C-index, Calinksi-Harabasz index, Dunn index and the execution time of the algorithm.
     """
     t0 = perf_counter()
     membership_matrix = fuzzy_cmeans(data, initial_centroids, m, c, eps, max_iter, dist)
@@ -119,8 +119,8 @@ def dbscan_exp(data: list[Point], eps: float, min_points: int,
 
     Returns
     -------
-    A string with the name of the algorithm and its parameters, the Silhouette index, the
-    Davies-Bouldin index, the C-index and the execution time of the algorithm.
+    A string with the name of the algorithm and its parameters, the Silhouette index, Davies-Bouldin index,
+    C-index, Calinksi-Harabasz index, Dunn index and the execution time of the algorithm.
     """
     t0 = perf_counter()
     (list_clusters, noise) = dbscan(data, eps, min_points, dist)
@@ -148,8 +148,8 @@ def em_exp(data: list[Point], n_clusters: int, initial_covariances: list[np.ndar
 
     Returns
     -------
-    A string with the name of the algorithm and its parameters, the Silhouette index, the
-    Davies-Bouldin index, the C-index and the execution time of the algorithm.
+    A string with the name of the algorithm and its parameters, the Silhouette index, Davies-Bouldin index,
+    C-index, Calinksi-Harabasz index, Dunn index and the execution time of the algorithm.
     """
     t0 = perf_counter()
     list_clusters = em(data,n_clusters, initial_covariances, eps ,max_iter)
