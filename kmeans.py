@@ -78,7 +78,7 @@ def kmeans(data: list[Point], k: int, eps: float, max_iter: int,
             cluster.add_point(point)
         for i in range(k):
             cluster = list_clusters[i]
-            centroid = cluster.centroid()
+            centroid = cluster.centroid(dist)
             new_centroids[i] = centroid
         iter += 1
     return list_clusters

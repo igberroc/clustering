@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
-
+import numpy as np
 import math
 from typing import Self, Callable, TypeVar
+
+from scipy.spatial import distance_matrix
 
 
 class Point:
@@ -122,15 +124,37 @@ class Cluster:
             s = s.sum(point)
         return s
 
-    def centroid(self) -> Point:
-        dimension = self.points_dimension()
-        s = Point.null_point(dimension)
-        for point in self.points:
-            s = s.sum(point)
-        n = len(self.points)
-        s = s.div_num(n)
-        return s
-    
+    def centroid(self, dist: Distance = euclidean_distance) -> Point:
+        if dist == euclidean_distance:
+            dimension = self.points_dimension()
+            mean = Point.null_point(dimension)
+            for point in self.points:
+                mean = mean.sum(point)
+            n = len(self.points)
+            mean = mean.div_num(n)
+            return mean
+        else:
+            cluster_list = list(self.points)
+            n = len(cluster_list)
+            distance_matrix = np.zeros((n,n))
+            for i in range(n):
+                point1 = cluster_list[i]
+                for j in range(i+1,n):
+                    point2 = cluster_list[j]
+                    distance_matrix[i,j] = dist(point1, point2)
+            minimum = math.inf
+            for i in range(n):
+                intra_cluster_sum = 0
+                for j in range(n):
+                    if j < i:
+                        intra_cluster_sum += distance_matrix[j,i]
+                    if j > i:
+                        intra_cluster_sum += distance_matrix[i,j]
+                if intra_cluster_sum < minimum:
+                    minimum = intra_cluster_sum
+                    medoid = cluster_list[i]
+            return medoid
+
     def clear(self) -> None:
         self.points = set()
 

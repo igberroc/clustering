@@ -113,7 +113,7 @@ def cluster_dispersion(cluster: Cluster, dist: Distance = euclidean_distance) ->
     -------
     dispersion and centroid.
     """
-    centroid = cluster.centroid()
+    centroid = cluster.centroid(dist)
     dispersion = 0
     for point in cluster.set_points():
         dispersion += dist(point,centroid)
@@ -229,10 +229,10 @@ def c_index(data: list[Point], list_clusters: list[Cluster], dist: Distance = eu
     return (s - s_min) / (s_max - s_min)
 
 
-def cluster_and_global_centroids(list_clusters: list[Cluster]) -> tuple[Point, list[Point], int]:
+def cluster_and_global_centroids(list_clusters: list[Cluster], dist: Distance = euclidean_distance) -> tuple[Point, list[Point]]:
     """
-    Given a list of clusters, returns the global centroid of all the points, a list of the centroids
-    of each cluster, and the number of points. It is an efficient way to calculate both the global centroid
+    Given a list of clusters, returns the global centroid of all the points and a list of the centroids
+    of each cluster. It is an efficient way to calculate both the global centroid
     and the centroids of each cluster at the same time.
 
     Parameters
@@ -241,20 +241,31 @@ def cluster_and_global_centroids(list_clusters: list[Cluster]) -> tuple[Point, l
 
     Returns
     -------
-    The global centroid, a list of the centroids of each cluster, and the number of points.
+    The global centroid and a list of the centroids of each cluster.
     """
-    dimension = list_clusters[0].points_dimension()
-    global_centroid = Point.null_point(dimension)
-    list_centroids = []
-    n = 0
-    for cluster in list_clusters:
-        points_sum = cluster.points_sum()
-        size = cluster.size()
-        n += size
-        list_centroids.append(points_sum.div_num(size))
-        global_centroid = global_centroid.sum(points_sum)
-    global_centroid = global_centroid.div_num(n)
-    return global_centroid, list_centroids, n
+
+    if dist == euclidean_distance:
+        dimension = list_clusters[0].points_dimension()
+        global_centroid = Point.null_point(dimension)
+        n = 0
+        list_centroids = []
+        for cluster in list_clusters:
+            points_sum = cluster.points_sum()
+            size = cluster.size()
+            list_centroids.append(points_sum.div_num(size))
+            global_centroid = global_centroid.sum(points_sum)
+        global_centroid = global_centroid.div_num(n)
+        return global_centroid, list_centroids
+    else:
+        list_medoids = []
+        set_all_points = set()
+        for cluster in list_clusters:
+            medoid = cluster.centroid(dist)
+            list_medoids.append(medoid)
+            set_all_points = set_all_points | cluster.set_points()
+        all_points_cluster = Cluster(set_all_points)
+        global_medoid = all_points_cluster.centroid(dist)
+        return global_medoid, list_medoids
 
 
 def ch_index(list_clusters: list[Cluster], dist: Distance = euclidean_distance) -> float:
@@ -272,10 +283,12 @@ def ch_index(list_clusters: list[Cluster], dist: Distance = euclidean_distance) 
     """
     ssb = 0
     ssw = 0
-    global_centroid, list_centroids, n = cluster_and_global_centroids(list_clusters)
+    global_centroid, list_centroids = cluster_and_global_centroids(list_clusters, dist)
     k = len(list_clusters)
+    n = 0
     for i in range(k):
         cluster = list_clusters[i]
+        n += cluster.size()
         centroid = list_centroids[i]
         ssb += cluster.size()*(dist(centroid,global_centroid)**2)
         for point in cluster.set_points():
