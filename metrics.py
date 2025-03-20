@@ -22,13 +22,12 @@ def min_dist_point_cluster(point: Point, list_clusters: list[Cluster],
     minimum distance.
     """
     minimum = math.inf
-    b = 0
     for cluster in list_clusters:
+        b = 0
         for point_in in cluster.set_points():
             b += dist(point,point_in)
         b = b / cluster.size()
         minimum = min(b,minimum)
-        b = 0
     return minimum
 
 
@@ -47,7 +46,7 @@ def avg_dist_point_cluster(point: Point, cluster: Cluster, dist: Distance = eucl
     average distance.
     """
     a = 0
-    for point_in in cluster.points:
+    for point_in in cluster.set_points():
         a += dist(point,point_in)
     if cluster.size() != 1:
         a = a / (cluster.size()-1)

@@ -14,6 +14,77 @@ from dbscan import dbscan
 from EM import em
 
 
+def inertia(list_clusters: list[Cluster], dist: Distance = euclidean_distance) -> float:
+    """
+    Given a list of clusters and a distance function, returns the inertia metric.
+
+    Parameters
+    ----------
+    list_clusters: list of clusters.
+    dist: distance function (for inertia is usually euclidean distance).
+
+    Returns
+    -------
+    Inertia metric.
+    """
+    inertia = 0
+    for cluster in list_clusters:
+        centroid = cluster.centroid(dist)
+        for point in cluster.set_points():
+            inertia += dist(centroid, point)**2
+    return inertia
+
+def total_dissimilarity(list_clusters: list[Cluster], dist: Distance) -> float:
+    """
+    Given a list of clusters and the distance function, computes the total dissimilarity.
+
+    Parameters
+    ----------
+    list_clusters: list of clusters.
+    dist: distance function.
+
+    Returns
+    -------
+    Total dissimilarity (sum of distances between each point and their medoid).
+    """
+    total_dissimilarity = 0
+    for cluster in list_clusters:
+        medoid = cluster.centroid(dist)
+        for point in cluster.set_points():
+            total_dissimilarity += dist(medoid, point)
+    return total_dissimilarity
+
+def elbow_method(data: list[Point], max_k: int, eps: float, max_iter: int,
+                 filename: str, method: Callable[...,float] = inertia,
+                 dist: Distance = euclidean_distance) -> None:
+    """
+    Given a list of points, the maximum k value for finding the optimal number of clusters,
+    the parameters for k-means, the filename to save the plot, and the metric for evaluating the elbow method,
+    it saves the plot.
+
+    Parameters
+    ----------
+    data: list of points.
+    max_k: maximum k value for finding the optimal number of clusters.
+    eps: tolerance for k-means.
+    max_iter: maximum number of iterations for k-means.
+    filename: filename to save the plot.
+    method: metric function for evaluating the elbow method.
+    dist: distance function.
+
+    """
+    k_values = range(1, max_k + 1)
+    method_values = []
+    for k in k_values:
+        list_clusters = kmeans(data, k, eps, max_iter, dist)
+        method_values.append(method(list_clusters, dist))
+    plt.figure()
+    plt.plot(k_values, method_values, marker = 'o', linestyle = '-', color = 'b')
+    plt.xlabel('Number of clusters (k)')
+    plt.ylabel(f'{method.__name__}')
+    plt.savefig(filename, format = 'svg')
+
+
 def kmeans_exp(data: list[Point], k: int, eps: float, max_iter: int
                 , dist: Distance = euclidean_distance) -> tuple[str, float, float, float, float, float, float]:
     """
@@ -35,6 +106,7 @@ def kmeans_exp(data: list[Point], k: int, eps: float, max_iter: int
     t0 = perf_counter()
     list_clusters = kmeans(data, k, eps, max_iter, dist)
     t1 = perf_counter()
+    print("Terminado")
     silhouette = silhouette_index(list_clusters, dist)
     db = db_index(list_clusters, dist)
     c = c_index(data, list_clusters, dist)
@@ -188,5 +260,6 @@ def table_plot(results: list[list], plot_title: str, filename: str):
     table.set_fontsize(10)
     table.auto_set_column_width([0, 1, 2, 3, 4])
     plt.savefig(filename, format = "svg")
+
 
 

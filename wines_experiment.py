@@ -9,10 +9,27 @@ import numpy as np
 
 from points import Point
 from agglomerative import median, complete, average, ward
-from experiment_functions import kmeans_exp, agglomerative_exp, fuzzy_exp, dbscan_exp, em_exp, table_plot
+from experiment_functions import elbow_method, kmeans_exp, agglomerative_exp, fuzzy_exp, dbscan_exp, em_exp, table_plot
+
+
+def elbow_exp():
+    """
+    Elbow method on the dataset to find the optimal number of clusters. It saves a plot.
+    """
+    df = pd.read_csv('wine_dataset.csv')
+    df_tuples = df.itertuples(index = False, name = None)
+    data = []
+    for point_coordinates in df_tuples:        #Changing data into points.
+        data.append(Point(*point_coordinates))
+    max_k = 10
+    elbow_method(data, max_k, 0.001, 100, "elbow_wines.svg")
+
 
 def subplot_dendrogram(linkage_matrix1: np.ndarray, linkage_matrix2: np.ndarray, method1: str,
-                       method2: str, filename: str):
+                       method2: str, filename: str) -> None:
+    """
+    Given two linkage matrices and their linkage methods, saves both dendrograms in a svg file.
+    """
     fig, axes = plt.subplots(1, 2, figsize = (20, 4))
     dendrogram(linkage_matrix1, ax = axes[0], leaf_rotation = 90, leaf_font_size = 3)
     axes[0].set_title(method1)
