@@ -9,10 +9,10 @@ from time import perf_counter
 
 from points import gower_distance, Point, Distance, euclidean_distance
 from agglomerative import single, complete, average, weighted_average, median, ward, centroid, agglomerative
-from metrics import silhouette_index, c_index, dunn_index
+from metrics import silhouette_index, c_index, dunn_index, ch_index
 from kmeans import kmeans
 from dbscan import dbscan
-from experiment_functions import (total_dissimilarity, elbow_method,
+from experiment_functions import (total_dissimilarity, elbow_method, metric_optimal_n_clusters,
                                   kmeans_exp, agglomerative_exp, dbscan_exp, em_exp, table_plot)
 
 
@@ -59,30 +59,32 @@ def elbow_exp():
 def silhouette_exp():
     data, gower = reading_data_and_gower()
     max_k = 10
-    k_values = range(1, max_k + 1)
-    silhouette_values = []
-    for k in k_values:
-        list_clusters = kmeans(data, k, 0.01, 100, gower)
-        silhouette = silhouette_index(list_clusters, gower)
-        silhouette_values.append(silhouette)
-    plt.figure()
-    plt.plot(k_values, silhouette_values, marker = 'o', linestyle = '-', color = 'b')
-    plt.xlabel('Number of clusters (k)')
-    plt.ylabel('Silhouette index')
-    plt.savefig('silhouette_customers.svg', format='svg')
+    metric_optimal_n_clusters(data, max_k, 0, 100, 'silhouette_customers.svg', silhouette_index, gower)
 
+def dunn_exp():
+    data, gower = reading_data_and_gower()
+    max_k = 10
+    metric_optimal_n_clusters(data, max_k, 0, 100, 'dunn_customers.svg', dunn_index, gower)
 
+def ch_exp():
+    data, gower = reading_data_and_gower()
+    max_k = 10
+    metric_optimal_n_clusters(data, max_k, 0, 100, 'ch_customers.svg', ch_index, gower)
+
+ch_exp()
 
 if __name__ == '__main__':
+    """
     data, gower = reading_data_and_gower()
-
+    
+    
     agglomerative_result, linkage_matrix = agglomerative_exp(data, complete, 0.46, dist = gower)
     print(agglomerative_result)
 
     plt.figure(figsize = (20,4))
     dendrogram(linkage_matrix, leaf_rotation=90, leaf_font_size=3)
     plt.savefig('complete_aglom_customers.svg', format='svg')
-
+    """
 
 
 

@@ -84,6 +84,38 @@ def elbow_method(data: list[Point], max_k: int, eps: float, max_iter: int,
     plt.ylabel(f'{method.__name__}')
     plt.savefig(filename, format = 'svg')
 
+def metric_optimal_n_clusters(data: list[Point], max_k: int, eps: float, max_iter: int,
+                      filename: str, metric: Callable[..., float], dist: Distance = euclidean_distance) -> None:
+    """
+    Given a list of points, the maximum k value for finding the optimal number of clusters,
+    the parameters for k-means and the filename to save the plot, it saves the plot of the k values and
+    the values of the metric after kmeans result.
+
+    Parameters
+    ----------
+    data: list of points.
+    max_k: maximum k value for finding the optimal number of clusters.
+    eps: tolerance for k-means.
+    max_iter: maximum number of iterations for k-means.
+    filename: filename to save the plot.
+    dist: distance function.
+
+    """
+    k_values = range(2, max_k + 1)
+    metric_values = []
+    for k in k_values:
+        list_clusters = kmeans(data, k, eps, max_iter, dist)
+        if metric.__name__ == 'c_index':
+            value = metric(data, list_clusters, dist)
+        else:
+            value = metric(list_clusters, dist)
+        metric_values.append(value)
+    plt.figure()
+    plt.plot(k_values, metric_values, marker = 'o', linestyle = '-', color = 'b')
+    plt.xlabel('Number of clusters (k)')
+    plt.ylabel(metric.__name__)
+    plt.savefig(filename, format='svg')
+
 
 def kmeans_exp(data: list[Point], k: int, eps: float, max_iter: int
                 , dist: Distance = euclidean_distance) -> tuple[str, float, float, float, float, float, float]:
