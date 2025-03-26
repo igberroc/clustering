@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from typing import Callable
+import random
 
 from points import Cluster, euclidean_distance, Point, Distance
 from kmeans import kmeans
@@ -115,6 +116,36 @@ def metric_optimal_n_clusters(data: list[Point], max_k: int, eps: float, max_ite
     plt.xlabel('Number of clusters (k)')
     plt.ylabel(metric.__name__)
     plt.savefig(filename, format='svg')
+
+def random_data_sample(df: pd.DataFrame, n: int) -> list[Point]:
+    variables_ranges = []
+    min_values = list(df.min())
+    max_values = list(df.max())
+    for i in range(len(df.columns)):
+        col = df.columns[i]
+        column_type = df[col].dtype
+        unique_values = df[col].nunique()
+        if column_type == 'object' or column_type.name == 'category' or unique_values == 2 or unique_values == 1:
+            category_counts = df[col].value_counts(normalize = True)
+            categories = category_counts.index.tolist()
+            probabilities = category_counts.values.tolist()
+            variables_ranges.append((categories, probabilities))
+        else:
+            variables_ranges.append([min_values[i].item(), max_values[i].item()])
+    sample = [0 for _ in range(n)]
+    for i in range(n):
+        point_coordinates = []
+        for ranges in variables_ranges:
+            if type(ranges) == list:
+                if type(ranges[0]) == int:
+                    point_coordinates.append(random.randint(ranges[0], ranges[1]))
+                else:
+                    point_coordinates.append(random.uniform(ranges[0], ranges[1]))
+            else:
+                categories, probabilities = ranges
+                point_coordinates.append(np.random.choice(categories, p = probabilities).item())
+        sample.append(Point(*tuple(point_coordinates)))
+    return sample
 
 
 def kmeans_exp(data: list[Point], k: int, eps: float, max_iter: int

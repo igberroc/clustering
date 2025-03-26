@@ -12,7 +12,7 @@ from agglomerative import single, complete, average, weighted_average, median, w
 from metrics import silhouette_index, c_index, dunn_index, ch_index
 from kmeans import kmeans
 from dbscan import dbscan
-from experiment_functions import (total_dissimilarity, elbow_method, metric_optimal_n_clusters,
+from experiment_functions import (total_dissimilarity, elbow_method, metric_optimal_n_clusters, random_data_sample,
                                   kmeans_exp, agglomerative_exp, dbscan_exp, em_exp, table_plot)
 
 
@@ -59,7 +59,8 @@ def elbow_exp():
 def silhouette_exp():
     data, gower = reading_data_and_gower()
     max_k = 10
-    metric_optimal_n_clusters(data, max_k, 0, 100, 'silhouette_customers.svg', silhouette_index, gower)
+    metric_optimal_n_clusters(data, max_k, 0, 100, 'silhouette_customers.svg',
+                              silhouette_index, gower)
 
 def dunn_exp():
     data, gower = reading_data_and_gower()
@@ -70,8 +71,6 @@ def ch_exp():
     data, gower = reading_data_and_gower()
     max_k = 10
     metric_optimal_n_clusters(data, max_k, 0, 100, 'ch_customers.svg', ch_index, gower)
-
-ch_exp()
 
 if __name__ == '__main__':
     """
@@ -85,6 +84,16 @@ if __name__ == '__main__':
     dendrogram(linkage_matrix, leaf_rotation=90, leaf_font_size=3)
     plt.savefig('complete_aglom_customers.svg', format='svg')
     """
+
+    df = pd.read_csv('customer_dataset.csv', dayfirst=True)
+    df = df.dropna()
+    df['Dt_Customer'] = pd.to_datetime(df['Dt_Customer'], dayfirst=True)
+    df['Dt_Customer'] = df['Dt_Customer'].dt.year
+    df = df.drop('ID', axis=1)
+
+    sample = random_data_sample(df, 200)
+
+
 
 
 
