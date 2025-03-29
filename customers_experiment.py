@@ -1,4 +1,5 @@
 
+
 import pandas as pd
 import matplotlib.pyplot as plt
 from IPython.core.pylabtools import figsize
@@ -12,8 +13,9 @@ from agglomerative import single, complete, average, weighted_average, median, w
 from metrics import silhouette_index, c_index, dunn_index, ch_index
 from kmeans import kmeans
 from dbscan import dbscan
-from experiment_functions import (total_dissimilarity, elbow_method, metric_optimal_n_clusters, random_data_sample,
-                                  kmeans_exp, agglomerative_exp, dbscan_exp, em_exp, table_plot)
+from experiment_functions import kmeans_exp, agglomerative_exp, dbscan_exp, em_exp, table_plot
+from optimal_n_clusters import (total_dissimilarity, elbow_method, metric_optimal_n_clusters, random_data_sample,
+                                gap_statistic)
 
 
 def classify_variables(df: pd.DataFrame) -> tuple[list: bool, dict[int, tuple[int, int] | tuple[float, float]]]:
@@ -72,6 +74,15 @@ def ch_exp():
     max_k = 10
     metric_optimal_n_clusters(data, max_k, 0, 100, 'ch_customers.svg', ch_index, gower)
 
+def gap_exp():
+    df = pd.read_csv('customer_dataset.csv', dayfirst=True)
+    df = df.dropna()
+    df['Dt_Customer'] = pd.to_datetime(df['Dt_Customer'], dayfirst=True)
+    df['Dt_Customer'] = df['Dt_Customer'].dt.year
+    df = df.drop('ID', axis=1)
+
+
+
 if __name__ == '__main__':
     """
     data, gower = reading_data_and_gower()
@@ -90,8 +101,15 @@ if __name__ == '__main__':
     df['Dt_Customer'] = pd.to_datetime(df['Dt_Customer'], dayfirst=True)
     df['Dt_Customer'] = df['Dt_Customer'].dt.year
     df = df.drop('ID', axis=1)
+    bin_or_cat, min_max = classify_variables(df)
 
-    sample = random_data_sample(df, 200)
+    def gower(point1: Point, point2: Point) -> float:
+        return gower_distance(point1, point2, bin_or_cat, min_max)
+
+    print(gap_statistic(df, 7, 0.01, 100, 10, 'gap_customers.svg',
+                        total_dissimilarity, gower))
+
+
 
 
 

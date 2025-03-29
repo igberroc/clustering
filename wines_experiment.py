@@ -9,7 +9,8 @@ import numpy as np
 
 from points import Point
 from agglomerative import median, complete, average, ward
-from experiment_functions import elbow_method, kmeans_exp, agglomerative_exp, fuzzy_exp, dbscan_exp, em_exp, table_plot
+from experiment_functions import kmeans_exp, agglomerative_exp, fuzzy_exp, dbscan_exp, em_exp, table_plot
+from optimal_n_clusters import elbow_method
 
 
 def elbow_exp():
