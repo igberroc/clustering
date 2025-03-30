@@ -10,7 +10,7 @@ import numpy as np
 from points import Point
 from agglomerative import median, complete, average, ward
 from experiment_functions import kmeans_exp, agglomerative_exp, fuzzy_exp, dbscan_exp, em_exp, table_plot
-from optimal_n_clusters import elbow_method
+from optimal_n_clusters import elbow_method, gap_statistic
 
 
 def elbow_exp():
@@ -24,6 +24,29 @@ def elbow_exp():
         data.append(Point(*point_coordinates))
     max_k = 10
     elbow_method(data, max_k, 0.001, 100, "elbow_wines.svg")
+
+
+def gap_exp() -> int:
+    """
+    Gap statistic method on the dataset to find the optimal number of clusters. It saves a plot and returns the
+    optimal number of clusters.
+
+    Returns
+    -------
+    Optimal number of clusters.
+    """
+    df = pd.read_csv('wine_dataset.csv')
+    scaler = StandardScaler()
+    features = ['Alcohol', 'Malic_Acid', 'Ash', 'Ash_Alcanity', 'Magnesium', 'Total_Phenols', 'Flavanoids',
+                'Nonflavanoid_Phenols', 'Proanthocyanins', 'Color_Intensity', 'Hue', 'OD280', 'Proline']
+    df[features] = scaler.fit_transform(df[features])
+    df_tuples = df.itertuples(index = False, name = None)
+
+    data = []
+    for point_coordinates in df_tuples:        #Changing data into points.
+        data.append(Point(*point_coordinates))
+    max_k = 10
+    return gap_statistic(df, max_k, 0.001, 100, 100, "gap_wines.svg")
 
 
 def subplot_dendrogram(linkage_matrix1: np.ndarray, linkage_matrix2: np.ndarray, method1: str,

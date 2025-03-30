@@ -65,6 +65,7 @@ def agglomerative_exp(data: list[Point], method: Callable[..., float], max_dist:
     t0 = perf_counter()
     (linkage_matrix, list_clusters) = agglomerative(data, method, max_dist, dist)
     t1 = perf_counter()
+    print(len(list_clusters))
     silhouette = silhouette_index(list_clusters, dist)
     db = db_index(list_clusters, dist)
     c = c_index(data, list_clusters, dist)

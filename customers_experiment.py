@@ -69,33 +69,22 @@ def dunn_exp():
     max_k = 10
     metric_optimal_n_clusters(data, max_k, 0, 100, 'dunn_customers.svg', dunn_index, gower)
 
+
 def ch_exp():
     data, gower = reading_data_and_gower()
     max_k = 10
     metric_optimal_n_clusters(data, max_k, 0, 100, 'ch_customers.svg', ch_index, gower)
 
-def gap_exp():
-    df = pd.read_csv('customer_dataset.csv', dayfirst=True)
-    df = df.dropna()
-    df['Dt_Customer'] = pd.to_datetime(df['Dt_Customer'], dayfirst=True)
-    df['Dt_Customer'] = df['Dt_Customer'].dt.year
-    df = df.drop('ID', axis=1)
 
-
-
-if __name__ == '__main__':
+def gap_exp() -> int:
     """
-    data, gower = reading_data_and_gower()
-    
-    
-    agglomerative_result, linkage_matrix = agglomerative_exp(data, complete, 0.46, dist = gower)
-    print(agglomerative_result)
+    Gap statistic method on the dataset to find the optimal number of clusters. It saves a plot and returns the
+    optimal number of clusters.
 
-    plt.figure(figsize = (20,4))
-    dendrogram(linkage_matrix, leaf_rotation=90, leaf_font_size=3)
-    plt.savefig('complete_aglom_customers.svg', format='svg')
+    Returns
+    -------
+    Optimal number of clusters.
     """
-
     df = pd.read_csv('customer_dataset.csv', dayfirst=True)
     df = df.dropna()
     df['Dt_Customer'] = pd.to_datetime(df['Dt_Customer'], dayfirst=True)
@@ -106,10 +95,40 @@ if __name__ == '__main__':
     def gower(point1: Point, point2: Point) -> float:
         return gower_distance(point1, point2, bin_or_cat, min_max)
 
-    print(gap_statistic(df, 7, 0.01, 100, 10, 'gap_customers.svg',
-                        total_dissimilarity, gower))
+    return gap_statistic(df, 7, 0.01, 100, 25, 'gap_customers.svg',
+                      total_dissimilarity, gower)
 
 
+def main():
+    data, gower = reading_data_and_gower()
+    results = []
+
+    """
+    kmeans_result = kmeans(data, 4, 0.01, 100, gower)
+    results.append(kmeans_result)
+    """
+
+    """
+    agglomerative_result1, linkage_matrix1 = agglomerative_exp(data, complete, 0.45, dist = gower)
+    results.append(agglomerative_result1)
+    print(results)
+    plt.figure(figsize = (20, 4))
+    dendrogram(linkage_matrix1, leaf_rotation = 90, leaf_font_size = 3)
+    plt.savefig('complete_aglom_customers.svg', format = 'svg')
+    """
+
+    agglomerative_result2, linkage_matrix2 = agglomerative_exp(data, single, 0.1, dist=gower)
+    results.append(agglomerative_result2)
+    print(results)
+    plt.figure(figsize=(20, 4))
+    dendrogram(linkage_matrix2, leaf_rotation=90, leaf_font_size=3)
+    plt.savefig('single_aglom_customers.svg', format='svg')
+
+
+
+
+if __name__ == '__main__':
+    main()
 
 
 

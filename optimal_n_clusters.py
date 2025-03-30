@@ -131,8 +131,6 @@ def random_data_sample(df: pd.DataFrame) -> list[Point]:
     list of random points.
     """
     variables_ranges = []
-    min_values = list(df.min())
-    max_values = list(df.max())
     for i in range(len(df.columns)):
         col = df.columns[i]
         column_type = df[col].dtype
@@ -143,7 +141,11 @@ def random_data_sample(df: pd.DataFrame) -> list[Point]:
             probabilities = category_counts.values.tolist()
             variables_ranges.append((categories, probabilities))
         else:
-            variables_ranges.append([min_values[i].item(), max_values[i].item()])
+            min_val = df[col].min()
+            max_val = df[col].max()
+            min_val = min_val.item() if isinstance(min_val, (np.integer, np.floating)) else min_val
+            max_val = max_val.item() if isinstance(max_val, (np.integer, np.floating)) else max_val
+            variables_ranges.append([min_val, max_val])
     n = len(df)
     sample = [0 for _ in range(n)]
     for i in range(n):
