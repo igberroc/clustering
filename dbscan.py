@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 from points import Point, euclidean_distance,Distance,Cluster
 

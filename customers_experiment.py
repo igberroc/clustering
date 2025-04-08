@@ -103,6 +103,20 @@ def main():
     data, gower = reading_data_and_gower()
     results = []
 
+
+
+    """
+    number = 0
+    sum_dist = 0
+    for i in range(len(data)):
+        point1 = data[i]
+        for j in range(i + 1, len(data)):
+            point2 = data[j]
+            sum_dist += gower(point1, point2)
+            number += 1
+    print(sum_dist / number)
+    """
+
     """
     kmeans_result = kmeans(data, 4, 0.01, 100, gower)
     results.append(kmeans_result)
@@ -117,12 +131,39 @@ def main():
     plt.savefig('complete_aglom_customers.svg', format = 'svg')
     """
 
-    agglomerative_result2, linkage_matrix2 = agglomerative_exp(data, single, 0.1, dist=gower)
+    """
+    agglomerative_result2, linkage_matrix2 = agglomerative_exp(data, average, 0.32, dist = gower)
     results.append(agglomerative_result2)
     print(results)
     plt.figure(figsize=(20, 4))
     dendrogram(linkage_matrix2, leaf_rotation=90, leaf_font_size=3)
-    plt.savefig('single_aglom_customers.svg', format='svg')
+    plt.savefig('average2_aglom_customers.svg', format='svg')
+    """
+
+    """
+    agglomerative_result3, linkage_matrix3 = agglomerative_exp(data, weighted_average, 0.28, dist = gower)
+    results.append(agglomerative_result3)
+    print(results)
+    plt.figure(figsize=(25, 4))
+    dendrogram(linkage_matrix3, leaf_rotation=90, leaf_font_size=3)
+    plt.savefig('weighted_average_aglom_customers.svg', format='svg')
+    """
+
+
+    """
+    agglomerative_result4, linkage_matrix4 = agglomerative_exp(data, ward, 10.8, dist = gower)
+    results.append(agglomerative_result4)
+    print(results)
+    plt.figure(figsize=(20, 4))
+    dendrogram(linkage_matrix4, leaf_rotation=90, leaf_font_size=3)
+    plt.savefig('ward_aglom_customers.svg', format='svg')
+    """
+
+
+    dbscan_result1 = dbscan_exp(data, 0.05, 7, gower)
+    results.append(dbscan_result1)
+    print(results)
+
 
 
 

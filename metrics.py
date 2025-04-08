@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 
 from points import Distance, euclidean_distance, Point, Cluster
@@ -253,6 +252,7 @@ def cluster_and_global_centroids(list_clusters: list[Cluster], dist: Distance = 
             size = cluster.size()
             list_centroids.append(points_sum.div_num(size))
             global_centroid = global_centroid.sum(points_sum)
+            n += size
         global_centroid = global_centroid.div_num(n)
         return global_centroid, list_centroids
     else:
