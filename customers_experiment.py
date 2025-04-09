@@ -2,23 +2,31 @@
 
 import pandas as pd
 import matplotlib.pyplot as plt
-from IPython.core.pylabtools import figsize
 from scipy.cluster.hierarchy import dendrogram
-from typing import Callable
 import numpy as np
-from time import perf_counter
 
-from points import gower_distance, Point, Distance, euclidean_distance
-from agglomerative import single, complete, average, weighted_average, median, ward, centroid, agglomerative
-from metrics import silhouette_index, c_index, dunn_index, ch_index
-from kmeans import kmeans
-from dbscan import dbscan
-from experiment_functions import kmeans_exp, agglomerative_exp, dbscan_exp, em_exp, table_plot
-from optimal_n_clusters import (total_dissimilarity, elbow_method, metric_optimal_n_clusters, random_data_sample,
-                                gap_statistic)
+from points import gower_distance, Point, Distance
+from agglomerative import complete, average, weighted_average, ward
+from metrics import silhouette_index, dunn_index, ch_index
+from experiment_functions import kmeans_exp, agglomerative_exp, dbscan_exp, table_plot
+from optimal_n_clusters import total_dissimilarity, elbow_method, metric_optimal_n_clusters, gap_statistic
+
 
 
 def classify_variables(df: pd.DataFrame) -> tuple[list: bool, dict[int, tuple[int, int] | tuple[float, float]]]:
+    """
+    Given a dataframe, returns a list of boolean indicating which variables are categorical or binary, and which not,
+    along with a dictionary mapping continuous variables to their minimum and maximum values.
+
+    Parameters
+    ----------
+    df: dataframe.
+
+    Returns
+    -------
+    A list of boolean indicating which variables are categorical or binary (True), and which are continuos (False).
+    A dictionary mapping continuous variables to theirs minimum and maximum values.
+    """
     bin_or_cat = [False for _ in range(len(df.columns))]
     min_max = {}
     min_values = list(df.min())
@@ -35,6 +43,13 @@ def classify_variables(df: pd.DataFrame) -> tuple[list: bool, dict[int, tuple[in
 
 
 def reading_data_and_gower() -> tuple[list[Point], Distance]:
+    """
+    Reads the dataset, processes it, and returns a list of points along with the Gower distance function for the dataset.
+
+    Returns
+    -------
+    The list of points and the Gower distance function for the dataset.
+    """
     df = pd.read_csv('customer_dataset.csv', dayfirst = True)
     df = df.dropna()
     df['Dt_Customer'] = pd.to_datetime(df['Dt_Customer'], dayfirst = True)
@@ -52,25 +67,44 @@ def reading_data_and_gower() -> tuple[list[Point], Distance]:
     return data, gower
 
 
-def elbow_exp():
+def elbow_exp() -> None:
+    """
+    Apply the Elbow method to find the optimal number of clusters for the dataset. It saves a plot as a svg file.
+
+    """
     data, gower = reading_data_and_gower()
     max_k = 10
     elbow_method(data, max_k, 0.01, 100, 'elbow_customers.svg', total_dissimilarity, gower)
 
 
-def silhouette_exp():
+def silhouette_exp() -> None:
+    """
+    It saves a plot with the k (<= max_k) values and the values of Silhouette index after kmeans result.
+    Done to find the optimal number of clusters for the dataset.
+
+    """
     data, gower = reading_data_and_gower()
     max_k = 10
     metric_optimal_n_clusters(data, max_k, 0, 100, 'silhouette_customers.svg',
                               silhouette_index, gower)
 
-def dunn_exp():
+def dunn_exp() -> None:
+    """
+    It saves a plot with the k (<= max_k) values and the values of Dunn index after kmeans result.
+    Done to find the optimal number of clusters for the dataset.
+
+    """
     data, gower = reading_data_and_gower()
     max_k = 10
     metric_optimal_n_clusters(data, max_k, 0, 100, 'dunn_customers.svg', dunn_index, gower)
 
 
-def ch_exp():
+def ch_exp() -> None:
+    """
+    It saves a plot with the k (<= max_k) values and the values of Calinski-Harabasz index after kmeans result.
+    Done to find the optimal number of clusters for the dataset.
+
+    """
     data, gower = reading_data_and_gower()
     max_k = 10
     metric_optimal_n_clusters(data, max_k, 0, 100, 'ch_customers.svg', ch_index, gower)
@@ -99,73 +133,69 @@ def gap_exp() -> int:
                       total_dissimilarity, gower)
 
 
+def subplot_dendrogram(list_linkage_matrix: list[np.ndarray], list_methods: list[str],
+                       filename: str) -> None:
+    """
+    Given the list of linkage matrices and the list of their linkage methods,
+    saves all the dendrograms in a svg file.
+
+    Parameters
+    ----------
+    list_linkage_matrix: list with linkage matrices.
+    list_methods: list with method names of each linkage.
+    filename: name of the svg file to save the dendrograms.
+    """
+    fig, axes = plt.subplots(7, 1, figsize = (20, 4*7))
+    for i in range(len(list_linkage_matrix)):
+        dendrogram(list_linkage_matrix[i], ax = axes[i], leaf_rotation=90, leaf_font_size=3)
+        axes[i].set_title(list_methods[i])
+        axes[i].set_xlabel("cluster indexes")
+        axes[i].set_ylabel("distance between clusters")
+    plt.subplots_adjust(hspace = 0.5)
+    plt.savefig(filename, format="svg")
+
+
 def main():
+    """
+    Experiment with customers dataset. It saves a file with all the dendrograms of agglomerative clustering,
+    and a file with the table of all the clustering results.
+
+    """
     data, gower = reading_data_and_gower()
     results = []
 
+    kmeans_result1 = kmeans_exp(data, 4, 0.01, 100, gower)
+    results.append(kmeans_result1)
+    kmeans_result2 = kmeans_exp(data, 3, 0.01, 100, gower)
+    results.append(kmeans_result2)
 
-
-    """
-    number = 0
-    sum_dist = 0
-    for i in range(len(data)):
-        point1 = data[i]
-        for j in range(i + 1, len(data)):
-            point2 = data[j]
-            sum_dist += gower(point1, point2)
-            number += 1
-    print(sum_dist / number)
-    """
-
-    """
-    kmeans_result = kmeans(data, 4, 0.01, 100, gower)
-    results.append(kmeans_result)
-    """
-
-    """
     agglomerative_result1, linkage_matrix1 = agglomerative_exp(data, complete, 0.45, dist = gower)
-    results.append(agglomerative_result1)
-    print(results)
-    plt.figure(figsize = (20, 4))
-    dendrogram(linkage_matrix1, leaf_rotation = 90, leaf_font_size = 3)
-    plt.savefig('complete_aglom_customers.svg', format = 'svg')
-    """
+    agglomerative_result2, linkage_matrix2 = agglomerative_exp(data, average, 0.31, dist = gower)
+    agglomerative_result3, linkage_matrix3 = agglomerative_exp(data, average, 0.32, dist = gower)
+    agglomerative_result4, linkage_matrix4 = agglomerative_exp(data, average, 0.33, dist = gower)
+    agglomerative_result5, linkage_matrix5 = agglomerative_exp(data, weighted_average, 0.29, dist = gower)
+    agglomerative_result6, linkage_matrix6 = agglomerative_exp(data, ward, 20, dist = gower)
+    agglomerative_result7, linkage_matrix7 = agglomerative_exp(data, ward, 15, dist = gower)
+    list_linkage_matrix = []
+    for i in range(1,8):
+        result = eval(f"agglomerative_result{i}")
+        results.append(result)
+        linkage_matrix = eval(f"linkage_matrix{i}")
+        list_linkage_matrix.append(linkage_matrix)
+    list_methods = ["Complete linkage", "Average linkage", "Average linkage", "Average linkage",
+                    "Weighted average linkage", "Ward linkage", "Ward linkage"]
 
-    """
-    agglomerative_result2, linkage_matrix2 = agglomerative_exp(data, average, 0.32, dist = gower)
-    results.append(agglomerative_result2)
-    print(results)
-    plt.figure(figsize=(20, 4))
-    dendrogram(linkage_matrix2, leaf_rotation=90, leaf_font_size=3)
-    plt.savefig('average2_aglom_customers.svg', format='svg')
-    """
+    dbscan_result1 = dbscan_exp(data, 0.1, 4, gower)
+    dbscan_result2 = dbscan_exp(data, 0.11, 3, gower)
+    dbscan_result3 = dbscan_exp(data, 0.1, 6, gower)
+    dbscan_result4 = dbscan_exp(data, 0.1, 3, gower)
+    for i in range(1,5):
+        result = eval(f"dbscan_result{i}")
+        results.append(result)
 
-    """
-    agglomerative_result3, linkage_matrix3 = agglomerative_exp(data, weighted_average, 0.28, dist = gower)
-    results.append(agglomerative_result3)
-    print(results)
-    plt.figure(figsize=(25, 4))
-    dendrogram(linkage_matrix3, leaf_rotation=90, leaf_font_size=3)
-    plt.savefig('weighted_average_aglom_customers.svg', format='svg')
-    """
-
-
-    """
-    agglomerative_result4, linkage_matrix4 = agglomerative_exp(data, ward, 10.8, dist = gower)
-    results.append(agglomerative_result4)
-    print(results)
-    plt.figure(figsize=(20, 4))
-    dendrogram(linkage_matrix4, leaf_rotation=90, leaf_font_size=3)
-    plt.savefig('ward_aglom_customers.svg', format='svg')
-    """
-
-
-    dbscan_result1 = dbscan_exp(data, 0.05, 7, gower)
-    results.append(dbscan_result1)
-    print(results)
-
-
-
+    #Plots
+    subplot_dendrogram(list_linkage_matrix, list_methods, "dendrograms_customers.svg")
+    table_plot(results, "Customers clustering", "results_customers.svg")
 
 
 if __name__ == '__main__':
