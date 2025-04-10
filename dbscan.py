@@ -66,7 +66,7 @@ def dbscan(data: list[Point], eps: float, min_points: int,
                         cluster.add_point(neighbour)
                         new_list_neighbors = neighbors(data, neighbour, eps, dist)
                         if len(new_list_neighbors) + 1 >= min_points:
-                            list_neighbors = list_neighbors + new_list_neighbors
+                            list_neighbors.extend(new_list_neighbors)
                 list_clusters.append(cluster)
             else:
                 noise.add_point(point)

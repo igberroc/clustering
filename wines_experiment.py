@@ -142,7 +142,7 @@ def main_standarized():
     for i in range(3):             #One centroid for each cluster.
         point_coordinates = tuple([random.uniform(-2, 2) for _ in range(13)])
         initial_centroids.append(Point(*point_coordinates))
-    fuzzy_results = fuzzy_exp(data, initial_centroids, 1.25, 3, 0.001, 100)
+    fuzzy_results = fuzzy_exp(data, initial_centroids, 1.25, 3, 0.0001, 100)
     results.append(fuzzy_results)
 
     test_parameters = [(2.55, 22), (2.25,13), (2.15,10)]

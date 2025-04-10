@@ -11,7 +11,7 @@ from kmeans import kmeans
 from metrics import silhouette_index, db_index, c_index, ch_index, dunn_index
 from agglomerative import agglomerative
 from fuzzy import fuzzy_cmeans
-from dbscan import dbscan
+from dbscan_efficient import dbscan
 from EM import em
 
 

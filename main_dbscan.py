@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import random
 import matplotlib.pyplot as plt
@@ -139,7 +138,6 @@ def main3():
     plt.legend()
     plt.show()
         
-
 
 
 
