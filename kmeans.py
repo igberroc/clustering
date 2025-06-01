@@ -52,8 +52,9 @@ def kmeans(data: list[Point], k: int, eps: float, max_iter: int,
     
     Complexity
     -------
-    O(N*K*I) where N: number of points.
+    O(N*K*d*I) where N: number of points.
                    K: number of clusters.
+                   d: dimensionality of data.
                    I: maximum number of iterations.
 
     """
