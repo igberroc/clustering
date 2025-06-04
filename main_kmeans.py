@@ -13,7 +13,7 @@ from metrics import silhouette_index, db_index, c_index, ch_index, dunn_index
 
 def main1():
     delta = 0.25
-    n_points = 20
+    n_points = 100
     data1 = [Point(1 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(n_points)]
     data2 = [Point(1 + random.uniform(-delta,delta), 0 + random.uniform(-delta, delta )) for _ in range(n_points)]
     data3 = [Point(0 + random.uniform(-delta,delta), 1 + random.uniform(-delta, delta )) for _ in range(n_points)]
@@ -89,7 +89,6 @@ def main2():
     plt.show()
     
 
-    
     
     
     

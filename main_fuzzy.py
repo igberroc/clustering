@@ -3,6 +3,7 @@
 import seaborn as sns
 import random
 import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
 
 from points import Point
 from fuzzy import fuzzy_cmeans
@@ -50,12 +51,30 @@ def main_penguins():
     membership_matrix = fuzzy_cmeans(dataset, initial_centroids,2,3,0.001, 100)
     for i in range(3):
         plt.figure()
-        scatter = plt.scatter(x,y, c = membership_matrix[i,:], cmap=plt.cm.Blues, s = 50)
+        scatter = plt.scatter(x,y, c = membership_matrix[i,:], cmap = plt.cm.Blues, s = 50)
         plt.colorbar(scatter, label=f'Membership degree to cluster {i+1}')
         plt.title(f'Cluster {i+1}')
         plt.xlabel('X')
         plt.ylabel('Y')
         plt.show()
-    
+
+
+def main_iris():
+    iris = load_iris()
+    data = iris.data[2:,:4]
+    dataset = [Point(coord[0], coord[1]) for coord in data]
+    (x, y) = decompose_x_y(dataset)
+
+    initial_centroids = [Point(random.uniform(min(x), max(x)), random.uniform(min(y), max(y))) for _ in range(3)]
+    membership_matrix = fuzzy_cmeans(dataset, initial_centroids, 2, 3, 0.001, 100)
+
+    for i in range(3):
+        plt.figure()
+        scatter = plt.scatter(x, y, c = membership_matrix[i, :], cmap = plt.cm.Blues, s = 50)
+        plt.colorbar(scatter, label=f'Membership degree to cluster {i+1}')
+        plt.title(f'Cluster {i+1}')
+        plt.xlabel('Sepal length (cm)')
+        plt.ylabel('Sepal width (cm)')
+        plt.show()
     
 
