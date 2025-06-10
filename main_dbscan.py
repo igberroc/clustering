@@ -137,8 +137,7 @@ def main3():
     plt.title("Clusters DBSCAN")
     plt.legend()
     plt.show()
-        
-main2()
+
 
 
     
