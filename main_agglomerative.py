@@ -75,4 +75,4 @@ def main2():
     plt.show()
 
     
-
+main1()

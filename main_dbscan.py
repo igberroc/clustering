@@ -70,7 +70,7 @@ def main2():
         while color in used_colors:
             color = random_color()
         used_colors.add(color)
-        plt.scatter(x,y, s = 10, color = color)
+        plt.plot(x,y, 'o', markerfacecolor = color)
     
     silhouette = silhouette_index(list_clusters)
     print(f"The Silhouette index is: {silhouette} ")
@@ -82,7 +82,7 @@ def main2():
     print(f"The C-index is: {c} ")
 
     (x,y) = decompose_x_y(noise)
-    plt.plot(x,y, 'o', color = 'black')
+    plt.plot(x, y, 'o', markerfacecolor='black')
 
     plt.xlabel("X")
     plt.ylabel("Y")
@@ -118,7 +118,7 @@ def main3():
         while color in used_colors:
             color = random_color()
         used_colors.add(color)
-        plt.scatter(x,y, s = 10, color = color)
+        plt.plot(x,y,'o', markerfacecolor = color)
     
     silhouette = silhouette_index(list_clusters)
     print(f"The Silhouette index is: {silhouette} ")
@@ -130,7 +130,7 @@ def main3():
     print(f"The C-index is: {c} ")
 
     (x,y) = decompose_x_y(noise)
-    plt.plot(x,y, 'o', color = 'black')
+    plt.plot(x,y, 'o', markerfacecolor = 'black')
 
     plt.xlabel("X")
     plt.ylabel("Y")
@@ -138,7 +138,7 @@ def main3():
     plt.legend()
     plt.show()
         
-
+main2()
 
 
     
