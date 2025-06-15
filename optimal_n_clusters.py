@@ -188,7 +188,7 @@ def gap_array(df: pd.DataFrame, max_k: int, eps: float, max_iter: int, n_samples
     list_samples = [random_data_sample(df) for _ in range(n_samples)]
     list_gap = [0 for _ in range(max_k)]
     list_std_errors = [0 for _ in range(max_k)]
-    print("EMPEZAMOS")
+    print("Starting GAP statistic")
     for k in range(1, max_k + 1):
         print("k:", k)
         list_clusters = kmeans(data, k, eps, max_iter, dist)
