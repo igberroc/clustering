@@ -11,7 +11,8 @@ from kmeans import kmeans
 from metrics import silhouette_index, db_index, c_index, ch_index, dunn_index
 from agglomerative import agglomerative
 from fuzzy import fuzzy_cmeans
-from dbscan_efficient import dbscan
+from dbscan import dbscan
+from dbscan_vptree import dbscan as dbscan_vptree
 from EM import em
 
 
@@ -137,6 +138,35 @@ def dbscan_exp(data: list[Point], eps: float, min_points: int,
     ch = ch_index(list_clusters, dist)
     dunn = dunn_index(list_clusters, dist)
     return (f'DBSCAN(eps = {eps}, min_points = {min_points})', len(list_clusters), noise.size(),
+            silhouette, db, c, ch, dunn, t1 - t0)
+
+
+def dbscan_vptree_exp(data: list[Point], eps: float, min_points: int,
+                dist: Distance = euclidean_distance) -> tuple[str, int, int, float, float, float, float, float, float]:
+    """
+    Test the DBSCAN VP-tree version algorithm with the given parameters.
+
+    Parameters
+    ----------
+    data: list of points.
+    eps: epsilon value for DBSCAN.
+    min_points: minimum number of points to make a neighborhood.
+    dist: distance function.
+
+    Returns
+    -------
+    A string with the name of the algorithm and its parameters, the Silhouette index, Davies-Bouldin index,
+    C-index, Calinksi-Harabasz index, Dunn index and the execution time of the algorithm.
+    """
+    t0 = perf_counter()
+    (list_clusters, noise) = dbscan_vptree(data, eps, min_points, dist)
+    t1 = perf_counter()
+    silhouette = silhouette_index(list_clusters, dist)
+    db = db_index(list_clusters, dist)
+    c = c_index(data, list_clusters, dist)
+    ch = ch_index(list_clusters, dist)
+    dunn = dunn_index(list_clusters, dist)
+    return (f'DBSCAN_vptree(eps = {eps}, min_points = {min_points})', len(list_clusters), noise.size(),
             silhouette, db, c, ch, dunn, t1 - t0)
 
 

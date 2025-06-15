@@ -9,11 +9,12 @@ import numpy as np
 
 from points import Point
 from agglomerative import median, complete, average, ward
-from experiment_functions import kmeans_exp, agglomerative_exp, fuzzy_exp, dbscan_exp, em_exp, table_plot
-from optimal_n_clusters import elbow_method, gap_statistic
+from experiment_functions import (kmeans_exp, agglomerative_exp, fuzzy_exp, dbscan_exp, dbscan_vptree_exp,
+                                  em_exp, table_plot)
+from optimal_n_clusters import elbow_method, gap_statistic, metric_optimal_n_clusters
+from metrics import silhouette_index, dunn_index
 
-
-def elbow_exp():
+def elbow_exp() -> None:
     """
     Elbow method on the dataset to find the optimal number of clusters. It saves a plot.
     """
@@ -24,6 +25,36 @@ def elbow_exp():
         data.append(Point(*point_coordinates))
     max_k = 10
     elbow_method(data, max_k, 0.001, 100, "elbow_wines.svg")
+
+
+def silhouette_exp() -> None:
+    """
+    It saves a plot with the k (<= max_k) values and the values of Silhouette index after kmeans result.
+    Done to find the optimal number of clusters for the dataset.
+
+    """
+    df = pd.read_csv('wine_dataset.csv')
+    df_tuples = df.itertuples(index = False, name = None)
+    data = []
+    for point_coordinates in df_tuples:        #Changing data into points.
+        data.append(Point(*point_coordinates))
+    max_k = 10
+    metric_optimal_n_clusters(data, max_k, 0.001, 100, "silhouette_wines.svg", silhouette_index)
+
+
+def dunn_exp() -> None:
+    """
+    It saves a plot with the k (<= max_k) values and the values of Dunn index after kmeans result.
+    Done to find the optimal number of clusters for the dataset.
+
+    """
+    df = pd.read_csv('wine_dataset.csv')
+    df_tuples = df.itertuples(index=False, name=None)
+    data = []
+    for point_coordinates in df_tuples:  # Changing data into points.
+        data.append(Point(*point_coordinates))
+    max_k = 10
+    metric_optimal_n_clusters(data, max_k, 0.001, 100, "dunn_wines.svg", dunn_index)
 
 
 def gap_exp() -> int:
@@ -49,21 +80,18 @@ def gap_exp() -> int:
     return gap_statistic(df, max_k, 0.001, 100, 100, "gap_wines.svg")
 
 
-def subplot_dendrogram(linkage_matrix1: np.ndarray, linkage_matrix2: np.ndarray, method1: str,
-                       method2: str, filename: str) -> None:
+def plot_dendrogram(linkage_matrix: np.ndarray, method: str, filename: str) -> None:
     """
     Given two linkage matrices and their linkage methods, saves both dendrograms in a svg file.
     """
-    fig, axes = plt.subplots(1, 2, figsize = (20, 4))
-    dendrogram(linkage_matrix1, ax = axes[0], leaf_rotation = 90, leaf_font_size = 3)
-    axes[0].set_title(method1)
-    axes[0].set_xlabel("cluster indexes")
-    axes[0].set_ylabel("distance between clusters")
-    dendrogram(linkage_matrix2, ax = axes[1], leaf_rotation = 90, leaf_font_size = 3)
-    axes[1].set_title(method2)
-    axes[1].set_xlabel("cluster indexes")
-    axes[1].set_ylabel("distance between clusters")
-    plt.savefig(filename, format = "svg")
+    plt.figure(figsize=(10, 5))
+    dendrogram(linkage_matrix, leaf_rotation=90, leaf_font_size=5)
+    plt.title(f"Dendrogram ({method})")
+    plt.xlabel("Cluster indexes")
+    plt.ylabel("Distance between clusters")
+    plt.tight_layout()
+    plt.savefig(filename, format="svg")
+    plt.close()
 
 
 def main_raw():
@@ -99,6 +127,9 @@ def main_raw():
     for (eps, min_points) in test_parameters:
         dbscan_results = dbscan_exp(data, eps, min_points)
         results.append(dbscan_results)
+    for (eps, min_points) in test_parameters:
+        dbscan_vptree_results = dbscan_vptree_exp(data, eps, min_points)
+        results.append(dbscan_vptree_results)
     """
     initial_covariances = np.diag([1,1,0.1,10,100,1,1,0.1,1,1,0.1,1,10000])  (variance estimations)
     """
@@ -107,10 +138,11 @@ def main_raw():
     results.append(em_results)
 
     #Plots
-    subplot_dendrogram(linkage_matrix1, linkage_matrix2, "Complete linkage",
-                      "Median linkage", "dendrograms_wines_raw.svg")
+    plot_dendrogram(linkage_matrix1,"Complete linkage", "complete_wines.svg")
+    plot_dendrogram(linkage_matrix2, "Median linkage", "median_wines.svg")
+    plot_dendrogram
     table_plot(results, "Wine clustering", "results_wines_raw.svg")
-
+main_raw()
 
 def main_standarized():
     """
@@ -155,9 +187,8 @@ def main_standarized():
     results.append(em_results)
 
     #Plots
-    subplot_dendrogram(linkage_matrix1, linkage_matrix2, "Average linkage",
-                       "Ward linkage", "dendrograms_wines_stand.svg")
-
+    plot_dendrogram(linkage_matrix1, "Average linkage", "average_wines_stand.svg")
+    plot_dendrogram(linkage_matrix2, "Ward linkage", "ward_wines_stand.svg")
     table_plot(results, "Wine clustering (standardized data)", "results_wines_stand.svg")
 
 
