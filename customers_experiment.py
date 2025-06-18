@@ -8,7 +8,7 @@ import numpy as np
 from points import gower_distance, Point, Distance
 from agglomerative import complete, average, weighted_average, ward
 from metrics import silhouette_index, dunn_index, ch_index
-from experiment_functions import kmeans_exp, agglomerative_exp, dbscan_exp, table_plot
+from experiment_functions import kmeans_exp, agglomerative_exp, dbscan_exp, dbscan_vptree_exp, table_plot
 from optimal_n_clusters import total_dissimilarity, elbow_method, metric_optimal_n_clusters, gap_statistic
 
 
@@ -24,7 +24,8 @@ def classify_variables(df: pd.DataFrame) -> tuple[list: bool, dict[int, tuple[in
 
     Returns
     -------
-    A list of boolean indicating which variables are categorical or binary (True), and which are continuos (False).
+    A list of boolean indicating which variables are categorical or binary (True), and which are continuos or
+     ordinal (False).
     A dictionary mapping continuous variables to theirs minimum and maximum values.
     """
     bin_or_cat = [False for _ in range(len(df.columns))]
@@ -54,7 +55,7 @@ def reading_data_and_gower() -> tuple[list[Point], Distance]:
     df = df.dropna()
     df['Dt_Customer'] = pd.to_datetime(df['Dt_Customer'], dayfirst = True)
     df['Dt_Customer'] = df['Dt_Customer'].dt.year
-    df = df.drop('ID', axis = 1)
+    df = df.drop(['ID','Z_CostContact', 'Z_Revenue'], axis = 1)
     bin_or_cat, min_max = classify_variables(df)
 
     def gower(point1: Point, point2: Point) -> float:
@@ -133,27 +134,18 @@ def gap_exp() -> int:
                       total_dissimilarity, gower)
 
 
-def subplot_dendrogram(list_linkage_matrix: list[np.ndarray], list_methods: list[str],
-                       filename: str) -> None:
+def plot_dendrogram(linkage_matrix: np.ndarray, method: str, filename: str) -> None:
     """
-    Given the list of linkage matrices and the list of their linkage methods,
-    saves all the dendrograms in a svg file.
-
-    Parameters
-    ----------
-    list_linkage_matrix: list with linkage matrices.
-    list_methods: list with method names of each linkage.
-    filename: name of the svg file to save the dendrograms.
+    Given a linkage matrix and the linkage method, saves the dendrogram in a svg file.
     """
-    fig, axes = plt.subplots(7, 1, figsize = (20, 4*7))
-    for i in range(len(list_linkage_matrix)):
-        dendrogram(list_linkage_matrix[i], ax = axes[i], leaf_rotation=90, leaf_font_size=3)
-        axes[i].set_title(list_methods[i])
-        axes[i].set_xlabel("cluster indexes")
-        axes[i].set_ylabel("distance between clusters")
-    plt.subplots_adjust(hspace = 0.5)
+    plt.figure(figsize=(20, 7))
+    dendrogram(linkage_matrix, leaf_rotation=90, leaf_font_size=5)
+    plt.title(f"Dendrogram ({method})")
+    plt.xlabel("Cluster indexes")
+    plt.ylabel("Distance between clusters")
+    plt.tight_layout()
     plt.savefig(filename, format="svg")
-
+    plt.close()
 
 def main():
     """
@@ -169,32 +161,41 @@ def main():
     kmeans_result2 = kmeans_exp(data, 3, 0.01, 100, gower)
     results.append(kmeans_result2)
 
+
     agglomerative_result1, linkage_matrix1 = agglomerative_exp(data, complete, 0.45, dist = gower)
-    agglomerative_result2, linkage_matrix2 = agglomerative_exp(data, average, 0.31, dist = gower)
-    agglomerative_result3, linkage_matrix3 = agglomerative_exp(data, average, 0.32, dist = gower)
-    agglomerative_result4, linkage_matrix4 = agglomerative_exp(data, average, 0.33, dist = gower)
-    agglomerative_result5, linkage_matrix5 = agglomerative_exp(data, weighted_average, 0.29, dist = gower)
-    agglomerative_result6, linkage_matrix6 = agglomerative_exp(data, ward, 20, dist = gower)
-    agglomerative_result7, linkage_matrix7 = agglomerative_exp(data, ward, 15, dist = gower)
-    list_linkage_matrix = []
-    for i in range(1,8):
+    agglomerative_result2, linkage_matrix2 = agglomerative_exp(data, complete, 0.495, dist=gower)
+    agglomerative_result3, linkage_matrix3 = agglomerative_exp(data, complete, 0.51, dist = gower)
+    agglomerative_result4, linkage_matrix4 = agglomerative_exp(data, average, 0.32, dist=gower)
+    agglomerative_result5, linkage_matrix5 = agglomerative_exp(data, average, 0.34, dist=gower)
+    agglomerative_result6, linkage_matrix6 = agglomerative_exp(data, average, 0.37, dist = gower)
+
+
+    for i in range(1,7):
         result = eval(f"agglomerative_result{i}")
         results.append(result)
-        linkage_matrix = eval(f"linkage_matrix{i}")
-        list_linkage_matrix.append(linkage_matrix)
-    list_methods = ["Complete linkage", "Average linkage", "Average linkage", "Average linkage",
-                    "Weighted average linkage", "Ward linkage", "Ward linkage"]
 
-    dbscan_result1 = dbscan_exp(data, 0.1, 4, gower)
-    dbscan_result2 = dbscan_exp(data, 0.11, 3, gower)
-    dbscan_result3 = dbscan_exp(data, 0.1, 6, gower)
-    dbscan_result4 = dbscan_exp(data, 0.1, 3, gower)
+    dbscan_result1 = dbscan_exp(data, 0.1, 6, gower)
+    dbscan_result2 = dbscan_exp(data, 0.12, 3, gower)
+    dbscan_result3 = dbscan_exp(data, 0.1, 4, gower)
+    dbscan_result4 = dbscan_exp(data, 0.11, 3, gower)
+
+
+    for i in range(1,5):
+        result = eval(f"dbscan_result{i}")
+        results.append(result)
+    dbscan_result1 = dbscan_vptree_exp(data, 0.1, 6, gower)
+    dbscan_result2 = dbscan_vptree_exp(data, 0.12, 3, gower)
+    dbscan_result3 = dbscan_vptree_exp(data, 0.1, 4, gower)
+    dbscan_result4 = dbscan_vptree_exp(data, 0.11, 3, gower)
+
+
     for i in range(1,5):
         result = eval(f"dbscan_result{i}")
         results.append(result)
 
     #Plots
-    subplot_dendrogram(list_linkage_matrix, list_methods, "dendrograms_customers.svg")
+    plot_dendrogram(linkage_matrix1, "Complete linkage", "complete_aglom_customers.svg")
+    plot_dendrogram(linkage_matrix3, "Average linkage", "average_aglom_customers.svg")
     table_plot(results, "Customers clustering", "results_customers.svg")
 
 

@@ -82,7 +82,7 @@ def gap_exp() -> int:
 
 def plot_dendrogram(linkage_matrix: np.ndarray, method: str, filename: str) -> None:
     """
-    Given two linkage matrices and their linkage methods, saves both dendrograms in a svg file.
+    Given a linkage matrix and the linkage method, saves the dendrogram in a svg file.
     """
     plt.figure(figsize=(10, 5))
     dendrogram(linkage_matrix, leaf_rotation=90, leaf_font_size=5)
@@ -96,8 +96,8 @@ def plot_dendrogram(linkage_matrix: np.ndarray, method: str, filename: str) -> N
 
 def main_raw():
     """
-    Experiment with wines dataset. It saves two files: one with the table results, and other
-    with the dendrograms of agglomerative clustering.
+    Experiment with wines dataset. It saves three files: one with the table results, and two others
+    with dendrograms of agglomerative clustering.
     In all algorithms, 3 clusters were sought.
     """
     df = pd.read_csv('wine_dataset.csv')
@@ -140,14 +140,13 @@ def main_raw():
     #Plots
     plot_dendrogram(linkage_matrix1,"Complete linkage", "complete_wines.svg")
     plot_dendrogram(linkage_matrix2, "Median linkage", "median_wines.svg")
-    plot_dendrogram
     table_plot(results, "Wine clustering", "results_wines_raw.svg")
-main_raw()
+
 
 def main_standarized():
     """
-    Experiment with wines dataset, but standardizing the data. It saves two files: one with the table results,
-    and other with the dendrograms of agglomerative clustering.
+    Experiment with wines dataset, but standardizing the data. It saves three files: one with the table results,
+    and two others with dendrograms of agglomerative clustering.
     In all algorithms, 3 clusters were sought.
     """
     df = pd.read_csv('wine_dataset.csv')
@@ -177,10 +176,13 @@ def main_standarized():
     fuzzy_results = fuzzy_exp(data, initial_centroids, 1.25, 3, 0.0001, 100)
     results.append(fuzzy_results)
 
-    test_parameters = [(2.55, 22), (2.25,13), (2.15,10)]
+    test_parameters = [(3, 2), (2.16,3)]
     for (eps, min_points) in test_parameters:
         dbscan_results = dbscan_exp(data, eps, min_points)
         results.append(dbscan_results)
+    for (eps, min_points) in test_parameters:
+        dbscan_vptree_results = dbscan_vptree_exp(data, eps, min_points)
+        results.append(dbscan_vptree_results)
 
     initial_covariances = [np.eye(13) for _ in range(3)]
     em_results = em_exp(data, 3, initial_covariances, 1e-20, 100)

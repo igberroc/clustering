@@ -19,7 +19,7 @@ from EM import em
 def kmeans_exp(data: list[Point], k: int, eps: float, max_iter: int,
                 dist: Distance = euclidean_distance) -> tuple[str, int, str, float, float, float, float, float, float]:
     """
-    Test the K-means algorithm with the given parameters.
+    Test the K-means algorithm, or K-medoids if euclidean distance is not used, with the given parameters.
 
     Parameters
     ----------
@@ -42,7 +42,12 @@ def kmeans_exp(data: list[Point], k: int, eps: float, max_iter: int,
     c = c_index(data, list_clusters, dist)
     ch = ch_index(list_clusters, dist)
     dunn = dunn_index(list_clusters, dist)
-    return f'KMeans(eps = {eps}, max_iter = {max_iter})', k, 'N/A', silhouette, db, c, ch, dunn, t1 - t0
+    if dist == euclidean_distance:
+        name = f'KMeans(eps = {eps}, max_iter = {max_iter})'
+    else:
+        name = f'KMedoids(eps = {eps}, max_iter = {max_iter})'
+    return name, k, 'N/A', silhouette, db, c, ch, dunn, t1 - t0
+
 
 
 def agglomerative_exp(data: list[Point], method: Callable[..., float], max_dist: int = 0,
@@ -215,20 +220,31 @@ def table_plot(results: list[list], plot_title: str, filename: str):
     df_results = pd.DataFrame(results,
                          columns=["Algorithm", "Clusters", "Noise points", "Silhouette", "Davies-Bouldin", "C-index",
                                   "Calinski-Harabasz", "Dunn", "Time(s)"])
-    plt.figure(figsize=(12, 4))
-    plt.title(plot_title, fontsize = 14, fontweight='bold')
+    row_count = len(df_results)
+    col_count = 9
+    row_height = 1
+    col_width = 3.5
+    fig_width = col_count * col_width
+    fig_height = (row_count + 1) * row_height
+    plt.figure(figsize=(fig_width, fig_height))
+    plt.title(plot_title, fontsize=28, fontweight='bold')
     ax = plt.gca()
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
     ax.set_frame_on(False)
-    table = plt.table(cellText=df_results.round(3).values,
-                      colLabels=df_results.columns,
-                      cellLoc='center',
-                      loc='center')
+    table = ax.table(
+        cellText=df_results.round(3).values,
+        colLabels=df_results.columns,
+        cellLoc='center',
+        loc='upper center'
+    )
     table.auto_set_font_size(False)
-    table.set_fontsize(10)
+    table.set_fontsize(26)
     table.auto_set_column_width([0, 1, 2, 3, 4, 5, 6, 7, 8])
-    plt.savefig(filename, format = "svg")
+    cell_height = 0.08
+    for key, cell in table.get_celld().items():
+        cell.set_height(cell_height)
+    plt.savefig(filename, format = "svg", bbox_inches='tight')
 
 
 
