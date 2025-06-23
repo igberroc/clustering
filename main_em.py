@@ -7,6 +7,7 @@ from EM import em
 from metrics import silhouette_index, db_index
 from points import Point, decompose_x_y
 
+
 def main1():
     n_clusters = 3
     n_points = 60
