@@ -6,7 +6,7 @@ from scipy.cluster.hierarchy import dendrogram
 import numpy as np
 
 from points import gower_distance, Point, Distance
-from agglomerative import complete, average, weighted_average, ward
+from agglomerative import complete, average
 from metrics import silhouette_index, dunn_index, ch_index
 from experiment_functions import kmeans_exp, agglomerative_exp, dbscan_exp, dbscan_vptree_exp, table_plot
 from optimal_n_clusters import total_dissimilarity, elbow_method, metric_optimal_n_clusters, gap_statistic
@@ -195,7 +195,7 @@ def main():
 
     #Plots
     plot_dendrogram(linkage_matrix1, "Complete linkage", "complete_aglom_customers.svg")
-    plot_dendrogram(linkage_matrix3, "Average linkage", "average_aglom_customers.svg")
+    plot_dendrogram(linkage_matrix4, "Average linkage", "average_aglom_customers.svg")
     table_plot(results, "Customers clustering", "results_customers.svg")
 
 

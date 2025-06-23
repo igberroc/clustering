@@ -70,8 +70,8 @@ def em(data: list[Point], n_clusters: int, initial_covariances: list[np.ndarray]
             probability_matrix[:, k] = weights[k] * multivariate_normal.pdf(array, mean = means[k], cov = covariances[k])
         probability_matrix /= probability_matrix.sum(axis = 1, keepdims = True)  #Posterior probability (E step).
         n_k = probability_matrix.sum(axis = 0)
-        weights = n_k / n       #New weights (M step).
-        for k in range(n_clusters):
+        weights = n_k / n       #New weights
+        for k in range(n_clusters): # and new parameters (M step).
             means[k] = (array * probability_matrix[:, k][:, np.newaxis]).sum(axis=0) / n_k[k]       #New means.
             dif = array - means[k]
             covariances[k] = np.dot((probability_matrix[:, k][:, np.newaxis] * dif).T, dif) / n_k[k]    #New covariances.
