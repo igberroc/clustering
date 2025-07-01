@@ -7,7 +7,7 @@ import random
 from sklearn.datasets import make_moons
 
 from kmeans import kmeans
-from points import Point, decompose_x_y, gower_distance
+from points import Point, decompose_x_y
 from metrics import silhouette_index, db_index, c_index, ch_index, dunn_index
 
 
@@ -87,9 +87,6 @@ def main2():
     plt.title("Clusters k-means")
     plt.legend()
     plt.show()
-
-
-
 
 
 

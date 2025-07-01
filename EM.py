@@ -51,10 +51,11 @@ def em(data: list[Point], n_clusters: int, initial_covariances: list[np.ndarray]
 
     Complexity
     -------
-    O(N*K*D^2*I) where N: number of points.
-                       K: number of clusters.
-                       D: dimension of the points.
-                       I: maximum number of iterations.
+    O(I*N*K*d^2) where I: number of iterations.
+                   N: number of points.
+                   K: number of clusters.
+                   d: dimension of the points.
+
     """
     array = np.array([list(point.get_coordinates()) for point in data])
     n = len(data)

@@ -47,7 +47,6 @@ def main1():
     plt.show()
     
 
-main1()
  
     
     

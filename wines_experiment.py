@@ -130,9 +130,7 @@ def main_raw():
     for (eps, min_points) in test_parameters:
         dbscan_vptree_results = dbscan_vptree_exp(data, eps, min_points)
         results.append(dbscan_vptree_results)
-    """
-    initial_covariances = np.diag([1,1,0.1,10,100,1,1,0.1,1,1,0.1,1,10000])  (variance estimations)
-    """
+
     initial_covariances = [12_000 * np.eye(13) for _ in range(3)]
     em_results = em_exp(data, 3, initial_covariances, 1e-20, 100)
     results.append(em_results)

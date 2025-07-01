@@ -54,9 +54,10 @@ def fuzzy_cmeans(data: list[Point], initial_centroids: list[Point], m: float, c:
 
     Complexity
     -------
-    O(N*(C^2)*I) where N: number of points.
-                   C: number of clusters.
-                   I: maximum number of iterations.
+    O(I*N*(C^2)*d) where I: number of iterations.
+                     N: number of points.
+                     C: number of clusters.
+                     d: dimensionality of data.
 
     """
     n = len(data)

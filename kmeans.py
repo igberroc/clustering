@@ -36,7 +36,7 @@ def kmeans(data: list[Point], k: int, eps: float, max_iter: int,
            dist: Distance = euclidean_distance) -> list[Cluster]:
     """
     Given a set of data, the number of clusters and conditions for the loop´s body,
-    returns the final clusters.
+    returns the clustering result of K-means if euclidean_distance is used, and K-medoids otherwise.
 
     Parameters
     ----------
@@ -52,10 +52,13 @@ def kmeans(data: list[Point], k: int, eps: float, max_iter: int,
     
     Complexity
     -------
-    O(N*K*d*I) where N: number of points.
-                   K: number of clusters.
-                   d: dimensionality of data.
-                   I: maximum number of iterations.
+    For K-means:
+        O(I*N*K*d)
+    For K-medoids:
+        O(N^2*d + I*(N*K + N^2/K)) where N: number of points.
+                                    K: number of clusters.
+                                    d: dimensionality of data.
+                                    I: number of iterations.
 
     """
     iter = 0

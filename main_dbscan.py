@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.datasets import make_moons
 import numpy as np
 
-from points import Point, Cluster, decompose_x_y
+from points import Point, decompose_x_y
 from dbscan import dbscan
 from metrics import silhouette_index, db_index, c_index
 
@@ -137,6 +137,7 @@ def main3():
     plt.title("Clusters DBSCAN")
     plt.legend()
     plt.show()
+
 
 
 

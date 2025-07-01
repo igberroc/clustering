@@ -4,8 +4,6 @@ import numpy as np
 import math
 from typing import Self, Callable, TypeVar
 
-from scipy.spatial import distance_matrix
-
 
 class Point:
     def __init__(self, *coord: float):
@@ -18,18 +16,27 @@ class Point:
         return self.coordinates
     
     def sum(self, other: Self) -> Self:
+        """
+        It returns the sum of the point and another point.
+        """
         s = [0 for _ in range(self.dimension())]
         for i in range(self.dimension()):
             s[i] = self.coordinates[i] + other.coordinates[i]
         return Point(*tuple(s))
     
-    def mul_num(self, n:int) -> Self:
+    def mul_num(self, n: int) -> Self:
+        """
+        It returns the multiplication of the point by the number n, applied coordinate by coordinate.
+        """
         coord = list(self.coordinates)
         for i in range(self.dimension()):
             coord[i] = coord[i] * n
         return Point(*tuple(coord))
             
     def div_num(self, n:int) -> Self:
+        """
+        It returns the division of the point by the number n, applied coordinate by coordinate.
+        """
         coord = list(self.coordinates)
         for i in range(self.dimension()):
             coord[i] = coord[i]/n
@@ -37,6 +44,9 @@ class Point:
     
     @staticmethod
     def null_point(dimension) -> Self:
+        """
+        It returns the null point of the given dimension.
+        """
         p = Point()
         p.coordinates = (0,)*dimension
         return p
@@ -118,6 +128,9 @@ class Cluster:
         return point.dimension()
 
     def points_sum(self) -> Point:
+        """
+        It returns the sum of all points in the cluster.
+        """
         dimension = self.points_dimension()
         s = Point.null_point(dimension)
         for point in self.points:
@@ -125,6 +138,9 @@ class Cluster:
         return s
 
     def centroid(self, dist: Distance = euclidean_distance) -> Point:
+        """
+        It returns the centroid of the cluster if euclidean distance is used, and the medoid otherwise.
+        """
         if dist == euclidean_distance:
             dimension = self.points_dimension()
             mean = Point.null_point(dimension)
@@ -162,15 +178,29 @@ class Cluster:
         return len(self.points)
     
     def combine(self,other) -> Self:
+        """
+        It returns a cluster resulting from combining the cluster and other one.
+        """
         cluster = Cluster()
         cluster.points = self.points | other.points
         return cluster
         
 
 def decompose_x_y(cluster: Cluster) -> tuple[list[float],list[float]]:
+    """
+    Given a cluster with 2 dimension points, it decomposes them into their x and y coordinates.
+
+    Parameters
+    ----------
+    cluster: the cluster.
+
+    Returns
+    -------
+    A tuple with the lists of x and y coordinates.
+    """
     x = []
     y = []
-    for point in cluster.points:
+    for point in cluster.set_points():
        x.append(point.coordinates[0])
        y.append(point.coordinates[1])
     return x, y

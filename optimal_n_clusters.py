@@ -1,5 +1,5 @@
 
-from time import perf_counter
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -9,11 +9,6 @@ import math
 
 from points import Cluster, euclidean_distance, Point, Distance
 from kmeans import kmeans
-from metrics import silhouette_index, db_index, c_index, ch_index, dunn_index
-from agglomerative import agglomerative
-from fuzzy import fuzzy_cmeans
-from dbscan import dbscan
-from EM import em
 
 
 def inertia(list_clusters: list[Cluster], dist: Distance = euclidean_distance) -> float:
@@ -120,7 +115,10 @@ def metric_optimal_n_clusters(data: list[Point], max_k: int, eps: float, max_ite
 
 def random_data_sample(df: pd.DataFrame) -> list[Point]:
     """
-    Given a dataframe, returns a random sample of points, according to the distribution of original data.
+    Given a dataframe, returns a random sample of points for the GAP statistic. For continuous variables,
+    values are randomly sampled from a uniform interval defined by the minimum and maximum values of
+    each variable. For categorical and binary variables, the sampled data preserves the same proportion
+    of categories as in the original data.
 
     Parameters
     ----------

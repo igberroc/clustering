@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 
-
-
 import math
 import numpy as np
 import inspect
-import copy
 from typing import Callable
 
 from points import Distance, Cluster, euclidean_distance, Point
+
 
 def proximity_matrix(data:list[Point], dist: Distance = euclidean_distance) -> tuple[np.ndarray,float,tuple[int,int]]:
     """
