@@ -56,7 +56,7 @@ def elbow_method(data: list[Point], max_k: int, eps: float, max_iter: int,
                  dist: Distance = euclidean_distance) -> None:
     """
     Given a list of points, the maximum k value for finding the optimal number of clusters,
-    the parameters for k-means, the filename to save the plot, and the metric for evaluating the elbow method,
+    the parameters for k-means, the filename to save the plot, and the criterion for evaluating the elbow method,
     it saves the plot.
 
     Parameters
